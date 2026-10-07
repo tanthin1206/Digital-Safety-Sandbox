@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -31,17 +31,10 @@ jobs:
         env:
           VITE_SHEET_URL: ${{ secrets.VITE_SHEET_URL }}
       - uses: actions/configure-pages@v5
-        continue-on-error: true
       - uses: actions/upload-pages-artifact@v3
-        continue-on-error: true
         with:
           path: dist
       - id: deployment
         uses: actions/deploy-pages@v4
-        continue-on-error: true
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+
 
