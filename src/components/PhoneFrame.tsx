@@ -83,7 +83,7 @@ export default function PhoneFrame({ platform, mode, name, status, avatarUrl, on
   const frame =
     mode === 'phone'
       ? 'h-[82vh] max-h-[760px] max-w-[380px] rounded-[2.2rem] border-[7px] border-slate-900 shadow-2xl'
-      : 'h-[calc(100dvh-6.5rem)] max-w-none rounded-lg border border-slate-300 shadow-xl'
+      : 'h-[calc(100dvh-1.5rem)] max-w-none rounded-lg border border-slate-300 shadow-xl'
   return (
     <div className={`relative mx-auto flex w-full flex-col overflow-hidden bg-white ${frame}`}>
       {mode === 'web' && (

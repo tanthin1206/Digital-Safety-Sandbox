@@ -154,19 +154,7 @@ export default function Play({ scenario, variantId, mode, studentId, grade, atte
   ) : null
 
   return (
-    <div className={mode === 'web' ? 'px-3 py-3' : 'p-3'}>
-      <div className={`mx-auto mb-2 text-center ${mode === 'web' ? 'max-w-none' : 'max-w-sm'}`}>
-        <div className="rounded-lg bg-amber-300 px-3 py-1 text-[11px] font-semibold text-amber-900">
-          ⚠️ ĐÂY LÀ MÔ PHỎNG GIÁO DỤC — mọi tên, số tài khoản đều là giả
-          {mode === 'web' && ` · ${scenario.title} · Bật loa để nghe tin nhắn thoại 🔊`}
-        </div>
-        {mode === 'phone' && (
-          <>
-            <h2 className="mt-2 text-base font-bold text-slate-900">{scenario.title}</h2>
-            <p className="text-xs text-slate-500">Bật loa để nghe tin nhắn thoại và cuộc gọi 🔊</p>
-          </>
-        )}
-      </div>
+    <div className={mode === 'web' ? 'p-2 sm:p-3' : 'p-3'}>
       <PhoneFrame
         platform={scenario.platform}
         mode={mode}
