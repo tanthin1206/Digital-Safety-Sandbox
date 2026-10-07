@@ -154,7 +154,7 @@ export default function Play({ scenario, variantId, mode, studentId, grade, atte
   ) : null
 
   return (
-    <div className={mode === 'web' ? 'px-3 pb-3 pt-12' : 'p-3'}>
+    <div className={mode === 'web' ? 'px-3 py-3' : 'p-3'}>
       <div className={`mx-auto mb-2 text-center ${mode === 'web' ? 'max-w-none' : 'max-w-sm'}`}>
         <div className="rounded-lg bg-amber-300 px-3 py-1 text-[11px] font-semibold text-amber-900">
           ⚠️ ĐÂY LÀ MÔ PHỎNG GIÁO DỤC — mọi tên, số tài khoản đều là giả

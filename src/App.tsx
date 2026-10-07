@@ -20,12 +20,7 @@ export default function App() {
   const [active, setActive] = useState<{ scenario: Scenario; variantId: number } | null>(null)
   const [results, setResults] = useState<Record<string, ScenarioResult>>({})
   const [attempts, setAttempts] = useState<Record<string, number>>({})
-  const [mode, setMode] = useState<ViewMode>(() => (localStorage.getItem('dss-mode') === 'phone' ? 'phone' : 'web'))
-
-  function changeMode(m: ViewMode) {
-    setMode(m)
-    localStorage.setItem('dss-mode', m)
-  }
+  const mode: ViewMode = 'web'
 
   useEffect(() => {
     const h = () => setHash(window.location.hash)
@@ -79,20 +74,5 @@ export default function App() {
   } else if (step === 'result') page = <Result results={results} onBack={() => setStep('menu')} onNext={() => setStep('survey')} />
   else page = <Survey studentId={studentId} grade={grade} />
 
-  return (
-    <>
-      <div className="fixed right-3 top-3 z-50 flex overflow-hidden rounded-full border border-slate-300 bg-white text-xs font-semibold shadow">
-        {(['web', 'phone'] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => changeMode(m)}
-            className={`px-3 py-1.5 ${mode === m ? 'bg-slate-800 text-white' : 'text-slate-600'}`}
-          >
-            {m === 'web' ? '🖥️ Web' : '📱 Điện thoại'}
-          </button>
-        ))}
-      </div>
-      {page}
-    </>
-  )
+  return page
 }
