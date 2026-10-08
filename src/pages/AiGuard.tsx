@@ -327,14 +327,16 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
   "urgentAdvice": ["Lời khuyên khẩn cấp 1", "Lời khuyên khẩn cấp 2", "Lời khuyên khẩn cấp 3"]
 }`
 
-    const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 15000)
+    const first = selectedModel === 'gemini-2.0-flash' ? 'gemini-3.8-flash' : selectedModel
+    const chain = [first, ...['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-1.5-flash'].filter((m) => m !== first)]
+    const errors: string[] = []
 
-    try {
-      let targetModel = selectedModel === 'gemini-2.0-flash' ? 'gemini-3.8-flash' : selectedModel
-      const callApi = async (m: string) => {
-        return fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${key}`,
+    for (const model of chain) {
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), 20000)
+      try {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -345,52 +347,51 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
             signal: controller.signal,
           },
         )
-      }
 
-      let res = await callApi(targetModel)
-
-      // Fallback if model not found or deprecated
-      if (!res.ok && (res.status === 404 || res.status === 400)) {
-        const fallbacks = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-1.5-flash']
-        for (const fb of fallbacks) {
-          if (fb === targetModel) continue
-          const fbRes = await callApi(fb)
-          if (fbRes.ok) {
-            res = fbRes
-            targetModel = fb
-            setSelectedModel(fb)
-            localStorage.setItem('gemini_model', fb)
-            break
-          }
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          const msg = err?.error?.message || `Mã lỗi ${res.status}`
+          errors.push(`[${model}] ${msg}`)
+          // Sai khóa / bị chặn thì thử model khác cũng vô ích
+          if (res.status === 401 || res.status === 403) break
+          continue
         }
-      }
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err?.error?.message || `Lỗi kết nối Gemini API [${targetModel}] (Mã lỗi ${res.status})`)
-      }
+        const data = await res.json()
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text
+        if (!rawText) {
+          errors.push(`[${model}] Không có dữ liệu phản hồi`)
+          continue
+        }
 
-      const data = await res.json()
-      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text
-      if (!rawText) throw new Error('Không nhận được dữ liệu phản hồi từ Gemini.')
-
-      const cleaned = String(rawText)
-        .replace(/^\s*```(?:json)?/i, '')
-        .replace(/```\s*$/, '')
-        .trim()
-      const parsed = JSON.parse(cleaned) as AnalysisResult
-      if (typeof parsed.scamScore !== 'number') throw new Error('Gemini trả về dữ liệu sai định dạng.')
-      parsed.detectedKeywords ??= []
-      parsed.urgentAdvice ??= []
-      return parsed
-    } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
-        throw new Error('Yêu cầu phân tích Gemini bị quá thời gian (Timeout 15s).')
+        const cleaned = String(rawText)
+          .replace(/^\s*```(?:json)?/i, '')
+          .replace(/```\s*$/, '')
+          .trim()
+        const parsed = JSON.parse(cleaned) as AnalysisResult
+        if (typeof parsed.scamScore !== 'number') {
+          errors.push(`[${model}] Dữ liệu sai định dạng`)
+          continue
+        }
+        parsed.detectedKeywords ??= []
+        parsed.urgentAdvice ??= []
+        if (model !== selectedModel) {
+          setSelectedModel(model)
+          localStorage.setItem('gemini_model', model)
+        }
+        return parsed
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          errors.push(`[${model}] quá 20 giây không phản hồi`)
+        } else {
+          errors.push(`[${model}] ${err instanceof Error ? err.message : String(err)}`)
+        }
+      } finally {
+        clearTimeout(timer)
       }
-      throw err
-    } finally {
-      clearTimeout(timer)
     }
+
+    throw new Error(errors.join(' | '))
   }
 
   const handleAnalyze = async () => {
