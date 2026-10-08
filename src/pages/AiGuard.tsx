@@ -36,7 +36,11 @@ const SAMPLE_MESSAGES = [
 
 export default function AiGuard() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '')
-  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem('gemini_model') || 'gemini-1.5-flash')
+  const [selectedModel, setSelectedModel] = useState(() => {
+    const saved = localStorage.getItem('gemini_model')
+    if (saved && saved !== 'gemini-2.0-flash') return saved
+    return 'gemini-3.8-flash'
+  })
   const [showKeyModal, setShowKeyModal] = useState(false)
   const [inputKey, setInputKey] = useState(apiKey)
   const [message, setMessage] = useState('')
@@ -79,17 +83,22 @@ export default function AiGuard() {
     }
 
     try {
-      let activeModel = modelToTest
-      let res = await tryModel(activeModel)
+      let targetModel = modelToTest === 'gemini-2.0-flash' ? 'gemini-3.8-flash' : modelToTest
+      let res = await tryModel(targetModel)
 
-      // Fallback if model not found on account
-      if (!res.ok && res.status === 404 && activeModel !== 'gemini-1.5-flash') {
-        const fallbackRes = await tryModel('gemini-1.5-flash')
-        if (fallbackRes.ok) {
-          res = fallbackRes
-          activeModel = 'gemini-1.5-flash'
-          setSelectedModel('gemini-1.5-flash')
-          localStorage.setItem('gemini_model', 'gemini-1.5-flash')
+      // Fallback chain if model is deprecated (e.g. 2.0-flash) or not found
+      if (!res.ok && (res.status === 404 || res.status === 400)) {
+        const fallbacks = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-1.5-flash']
+        for (const fb of fallbacks) {
+          if (fb === targetModel) continue
+          const fallbackRes = await tryModel(fb)
+          if (fallbackRes.ok) {
+            res = fallbackRes
+            targetModel = fb
+            setSelectedModel(fb)
+            localStorage.setItem('gemini_model', fb)
+            break
+          }
         }
       }
 
@@ -98,14 +107,14 @@ export default function AiGuard() {
         const errMsg = errData?.error?.message || `Mã lỗi HTTP ${res.status}`
         setKeyTestStatus({
           success: false,
-          message: `Kết nối thất bại với mô hình [${activeModel}]: ${errMsg}`,
+          message: `Kết nối thất bại với mô hình [${targetModel}]: ${errMsg}`,
         })
       } else {
         const data = await res.json().catch(() => ({}))
         const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
         setKeyTestStatus({
           success: true,
-          message: `Kết nối thành công! Khóa API hợp lệ với mô hình chuẩn [${activeModel}] (Google phản hồi: "${reply || 'OK'}"). Sẵn sàng phân tích an toàn mạng.`,
+          message: `Kết nối thành công! Khóa API hợp lệ với mô hình chuẩn mới nhất [${targetModel}] (Google phản hồi: "${reply || 'OK'}"). Sẵn sàng phân tích an toàn mạng.`,
         })
       }
     } catch (err: unknown) {
@@ -291,24 +300,10 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
   "urgentAdvice": ["Lời khuyên khẩn cấp 1", "Lời khuyên khẩn cấp 2", "Lời khuyên khẩn cấp 3"]
 }`
 
-    let activeModel = selectedModel
-    let res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${key}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: 'application/json' },
-        }),
-      },
-    )
-
-    // Fallback if model not found on account
-    if (!res.ok && res.status === 404 && activeModel !== 'gemini-1.5-flash') {
-      activeModel = 'gemini-1.5-flash'
-      res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${key}`,
+    let targetModel = selectedModel === 'gemini-2.0-flash' ? 'gemini-3.8-flash' : selectedModel
+    const callApi = async (m: string) => {
+      return fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${key}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -320,9 +315,27 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
       )
     }
 
+    let res = await callApi(targetModel)
+
+    // Fallback if model not found or deprecated
+    if (!res.ok && (res.status === 404 || res.status === 400)) {
+      const fallbacks = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-1.5-flash']
+      for (const fb of fallbacks) {
+        if (fb === targetModel) continue
+        const fbRes = await callApi(fb)
+        if (fbRes.ok) {
+          res = fbRes
+          targetModel = fb
+          setSelectedModel(fb)
+          localStorage.setItem('gemini_model', fb)
+          break
+        }
+      }
+    }
+
     if (!res.ok) {
       const err = await res.json().catch(() => ({}))
-      throw new Error(err?.error?.message || `Lỗi kết nối Gemini API [${activeModel}] (Mã lỗi ${res.status})`)
+      throw new Error(err?.error?.message || `Lỗi kết nối Gemini API [${targetModel}] (Mã lỗi ${res.status})`)
     }
 
     const data = await res.json()
@@ -374,7 +387,7 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
           <h1 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl flex items-center gap-2.5">
             <span>Trợ lý ảo AI "Cảnh Vệ Số"</span>
             <span className="rounded-full bg-indigo-600 px-2.5 py-0.5 text-xs font-bold text-white uppercase tracking-wider">
-              {selectedModel === 'gemini-1.5-flash' ? 'Gemini 1.5 Flash (Chuẩn)' : selectedModel}
+              {selectedModel === 'gemini-3.8-flash' ? 'Gemini 3.8 Flash (Chuẩn)' : selectedModel}
             </span>
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
@@ -648,12 +661,12 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
                   }}
                   className="mt-1 w-full rounded-xl border border-slate-300 p-2 text-xs text-slate-900 bg-white font-medium focus:border-indigo-600 focus:outline-hidden"
                 >
-                  <option value="gemini-1.5-flash">Gemini 1.5 Flash (Tiêu chuẩn Google AI Studio - Nhanh, ổn định & miễn phí)</option>
-                  <option value="gemini-2.0-flash">Gemini 2.0 Flash (Thế hệ mới 2.0)</option>
-                  <option value="gemini-1.5-pro">Gemini 1.5 Pro (Mô hình suy luận sâu)</option>
+                  <option value="gemini-3.8-flash">Gemini 3.8 Flash (Mô hình mới nhất Google khuyến nghị - Tốc độ & Thông minh)</option>
+                  <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite (Siêu nhanh, tối ưu chi phí)</option>
+                  <option value="gemini-1.5-flash">Gemini 1.5 Flash (Bản tương thích phổ thông)</option>
                 </select>
                 <p className="mt-1 text-[11px] text-slate-500">
-                  Google khuyến nghị sử dụng <strong>gemini-1.5-flash</strong> cho các tác vụ phân tích thời gian thực và tương thích 100% với tài khoản miễn phí.
+                  Google chính thức khuyến nghị sử dụng <strong>gemini-3.8-flash</strong> cho API mới nhất để có tính năng và độ chính xác phân tích cao nhất.
                 </p>
               </div>
 
