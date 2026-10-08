@@ -374,7 +374,14 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
       const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text
       if (!rawText) throw new Error('Không nhận được dữ liệu phản hồi từ Gemini.')
 
-      const parsed = JSON.parse(rawText) as AnalysisResult
+      const cleaned = String(rawText)
+        .replace(/^\s*```(?:json)?/i, '')
+        .replace(/```\s*$/, '')
+        .trim()
+      const parsed = JSON.parse(cleaned) as AnalysisResult
+      if (typeof parsed.scamScore !== 'number') throw new Error('Gemini trả về dữ liệu sai định dạng.')
+      parsed.detectedKeywords ??= []
+      parsed.urgentAdvice ??= []
       return parsed
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
@@ -408,8 +415,9 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
       console.warn('Gemini API call failed, falling back to heuristic engine:', err)
       const res = analyzeWithHeuristics(message)
       setResult(res)
+      const detail = err instanceof Error ? err.message : String(err)
       setErrorMsg(
-        'Đã phân tích bằng Động cơ AI Cảnh Vệ Số tích hợp (Gemini API trả về lỗi hoặc hạn ngạch).',
+        `Gemini API lỗi nên đã dùng Động cơ Cảnh Vệ Số tích hợp. Chi tiết lỗi từ Google: ${detail}`,
       )
     } finally {
       setLoading(false)
