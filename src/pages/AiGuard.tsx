@@ -42,11 +42,63 @@ export default function AiGuard() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<AnalysisResult | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
+  const [testingKey, setTestingKey] = useState(false)
+  const [keyTestStatus, setKeyTestStatus] = useState<{ success: boolean; message: string } | null>(null)
 
   const handleSaveKey = () => {
     localStorage.setItem('gemini_api_key', inputKey.trim())
     setApiKey(inputKey.trim())
     setShowKeyModal(false)
+  }
+
+  const handleTestKey = async (keyToTest: string) => {
+    const k = keyToTest.trim()
+    if (!k) {
+      setKeyTestStatus({
+        success: false,
+        message: 'Vui lòng nhập khóa Gemini API trước khi kiểm tra.',
+      })
+      return
+    }
+    setTestingKey(true)
+    setKeyTestStatus(null)
+
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: 'Trả lời đúng 1 chữ: OK' }] }],
+          }),
+        },
+      )
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        const errMsg = errData?.error?.message || `Mã lỗi HTTP ${res.status}`
+        setKeyTestStatus({
+          success: false,
+          message: `Kết nối thất bại: ${errMsg}`,
+        })
+      } else {
+        const data = await res.json().catch(() => ({}))
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+        setKeyTestStatus({
+          success: true,
+          message: `Kết nối thành công! Khóa API Gemini hợp lệ (Phản hồi: "${reply || 'OK'}"). Sẵn sàng sử dụng với mô hình Gemini 2.0 Flash.`,
+        })
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Lỗi kết nối'
+      setKeyTestStatus({
+        success: false,
+        message: `Lỗi kết nối: ${msg}. Vui lòng kiểm tra lại kết nối mạng hoặc tính hợp lệ của khóa API.`,
+      })
+    } finally {
+      setTestingKey(false)
+    }
   }
 
   // Smart heuristic analyzer (works immediately even without API key)
@@ -295,10 +347,34 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
           </p>
         </div>
 
-        {/* API Key configuration toggle */}
-        <div className="flex items-center gap-2">
+        {/* API Key configuration & Test Buttons */}
+        <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={() => setShowKeyModal(true)}
+            onClick={() => {
+              if (!apiKey) {
+                setShowKeyModal(true)
+                setKeyTestStatus({
+                  success: false,
+                  message: 'Chưa cài đặt API Key. Vui lòng nhập khóa Gemini API trước khi kiểm tra.',
+                })
+              } else {
+                handleTestKey(apiKey)
+              }
+            }}
+            disabled={testingKey}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3.5 py-2 text-xs font-bold shadow-xs transition active:scale-95 disabled:opacity-50"
+            title="Kiểm tra kết nối trực tiếp đến Google Gemini API"
+          >
+            <span>{testingKey ? '⏳' : '🧪'}</span>
+            <span>{testingKey ? 'Đang kiểm tra...' : 'Kiểm tra API Key'}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setKeyTestStatus(null)
+              setInputKey(apiKey)
+              setShowKeyModal(true)
+            }}
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-50 transition active:scale-95"
           >
             <span>🔑</span>
@@ -306,6 +382,29 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
           </button>
         </div>
       </div>
+
+      {/* Test status banner on main page */}
+      {keyTestStatus && !showKeyModal && (
+        <div
+          className={`mt-4 rounded-2xl p-4 text-xs sm:text-sm font-medium flex items-center justify-between gap-3 border shadow-xs animate-in fade-in duration-200 ${
+            keyTestStatus.success
+              ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
+              : 'bg-rose-50 text-rose-900 border-rose-200'
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="text-base shrink-0">{keyTestStatus.success ? '✅' : '❌'}</span>
+            <span>{keyTestStatus.message}</span>
+          </div>
+          <button
+            onClick={() => setKeyTestStatus(null)}
+            className="text-slate-400 hover:text-slate-600 font-bold px-2 py-1 shrink-0"
+            title="Đóng thông báo"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Main Input Section */}
       <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7 shadow-xs">
@@ -505,14 +604,46 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                   Gemini API Key:
                 </label>
-                <input
-                  type="password"
-                  value={inputKey}
-                  onChange={(e) => setInputKey(e.target.value)}
-                  placeholder="AIzaSy..."
-                  className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs text-slate-900 focus:border-indigo-600 focus:outline-hidden"
-                />
+                <div className="mt-1 flex gap-2">
+                  <input
+                    type="password"
+                    value={inputKey}
+                    onChange={(e) => {
+                      setInputKey(e.target.value)
+                      setKeyTestStatus(null)
+                    }}
+                    placeholder="AIzaSy..."
+                    className="flex-1 rounded-xl border border-slate-300 p-2.5 text-xs text-slate-900 focus:border-indigo-600 focus:outline-hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleTestKey(inputKey)}
+                    disabled={testingKey || !inputKey.trim()}
+                    className="shrink-0 inline-flex items-center gap-1 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3.5 py-2 text-xs font-bold transition active:scale-95 disabled:opacity-40"
+                    title="Kiểm tra khóa API trực tiếp"
+                  >
+                    <span>{testingKey ? '⏳' : '🧪'}</span>
+                    <span>{testingKey ? 'Đang test...' : 'Kiểm tra'}</span>
+                  </button>
+                </div>
               </div>
+
+              {/* In-modal test feedback */}
+              {keyTestStatus && (
+                <div
+                  className={`rounded-xl p-3 text-xs font-medium border leading-relaxed animate-in fade-in duration-150 ${
+                    keyTestStatus.success
+                      ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
+                      : 'bg-rose-50 text-rose-900 border-rose-200'
+                  }`}
+                >
+                  <div className="flex items-start gap-2">
+                    <span className="shrink-0 text-sm">{keyTestStatus.success ? '✅' : '❌'}</span>
+                    <span className="flex-1">{keyTestStatus.message}</span>
+                  </div>
+                </div>
+              )}
+
               <div className="text-[11px] text-slate-400">
                 Chưa có khóa API? Lấy khóa miễn phí tại{' '}
                 <a
