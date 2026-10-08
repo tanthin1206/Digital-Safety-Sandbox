@@ -173,11 +173,11 @@ const TOPICS: ScamTopic[] = [
 ]
 
 type Props = {
-  onStartGame: () => void
+  onStartGame?: () => void
   onOpenChat: (scenarioId: string) => void
 }
 
-export default function Handbook({ onStartGame, onOpenChat }: Props) {
+export default function Handbook({ onOpenChat }: Props) {
   const [searchTerm, setSearchTerm] = useState('')
 
   const filtered = TOPICS.filter((t) =>
@@ -200,22 +200,6 @@ export default function Handbook({ onStartGame, onOpenChat }: Props) {
           </h1>
           <div className="mt-1 text-base sm:text-lg font-semibold text-indigo-200">
             Nhận diện các hình thức lừa đảo phổ biến
-          </div>
-          <p className="mt-2 text-sm text-slate-300 sm:text-base leading-relaxed">
-            Nhận diện chuyên sâu 5 phương thức lừa đảo trực tuyến tinh vi nhất tại Việt Nam hiện nay. Nhấn vào từng kịch bản bên dưới để mở giao diện chat thực tế và vạch trần thủ đoạn của kẻ gian.
-          </p>
-
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <button
-              onClick={onStartGame}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg transition hover:from-blue-500 hover:to-indigo-500 active:scale-95"
-            >
-              <span>🎮 Trải nghiệm thực tế với trò chơi Tàn Ảo</span>
-              <span>→</span>
-            </button>
-            <span className="text-xs text-slate-400">
-              ⚡ Bấm "Mở đoạn chat thực tế" để xem và tương tác trực tiếp
-            </span>
           </div>
         </div>
 
