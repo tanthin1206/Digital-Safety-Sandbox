@@ -33,7 +33,7 @@ const TOPICS: ScamTopic[] = [
     tactics: [
       'Dùng công cụ trực tuyến tạo bill chuyển khoản ngân hàng giả (Fake Bill) có đầy đủ tên, số tài khoản của nạn nhân trong 10 giây.',
       'Lấy cớ lỗi mạng liên ngân hàng Napas, nghẽn đường truyền cuối tuần để giải thích vì sao tiền chưa vào tài khoản.',
-      'Tặng kèm hoa hồng nhỏ (500k - 1 triệu hoặc tiền trà sữa) để kích thích lòng tham và làm mờ sự cảnh giác.',
+      'Tặng kèm hoa hồng nhỏ (500k - 1 triệu hoặc tiền cà phê) để kích thích lòng tham và làm mờ sự cảnh giác.',
       'Tài khoản thụ hưởng chuyển đi là tài khoản "rác" đứng tên người lạ.',
     ],
     psychology: 'Lợi dụng tình bạn, sự tin tưởng thân thiết giữa bạn bè và lòng tham số tiền hoa hồng nhỏ để nạn nhân vội vàng ra quyết định mà không kiểm tra số dư thực tế.',
@@ -59,114 +59,107 @@ const TOPICS: ScamTopic[] = [
     dangerLevel: 'Đặc biệt nghiêm trọng',
     badgeColor: 'bg-rose-600',
     avatar: 'images/avatar_chu_tuan.jpg',
-    summary: 'Kẻ lừa đảo sử dụng công nghệ Deepfake AI hoán đổi khuôn mặt và bắt chước giọng nói của người thân để gọi video call 3-5 giây. Sau đó dập máy lấy cớ sóng yếu, nhắn tin dồn dập báo người nhà bị tai nạn nguy kịch đang chờ mổ để ép chuyển viện phí.',
+    summary: 'Kẻ lừa đảo thu thập hình ảnh và video của người thân nạn nhân trên Facebook/TikTok, dùng công nghệ AI Deepfake hoán đổi khuôn mặt và bắt chước giọng nói. Chúng thực hiện cuộc gọi video ngắn vài giây rồi giả vờ mất mạng, sau đó nhắn tin thông báo người thân bị tai nạn nguy kịch cần chuyển gấp viện phí cấp cứu.',
     tactics: [
-      'Thu thập video, hình ảnh và giọng nói của người thân trên mạng xã hội để train mô hình Deepfake.',
-      'Chỉ gọi video 3-5 giây với hình ảnh giật méo rồi cúp máy ngay nhằm tránh bị phát hiện lỗi khẩu hình của AI.',
-      'Dựng kịch bản tai nạn giao thông chấn thương sọ não, gửi phiếu viện phí giả mạo có dấu đỏ.',
-      'Cấm gọi lại điện thoại với lý do "nội quy phòng cấp cứu ICU cấm nghe máy".',
-      'Yêu cầu nộp tiền vào số tài khoản cá nhân của "bác sĩ trực" hoặc "kế toán viện".',
+      'Thực hiện cuộc gọi video Deepfake chỉ kéo dài 3 - 5 giây với hình ảnh giật cục, ánh mắt đờ đẫn, khẩu hình miệng không khớp giọng nói.',
+      'Cố tình rung lắc camera và tắt phụp cuộc gọi, lấy lý do "sóng trong bệnh viện quá yếu" hoặc "đang chạy theo băng ca cấp cứu".',
+      'Gửi kèm hóa đơn viện phí mổ não/chấn thương sọ não giả mạo có mộc đỏ giả của Bệnh viện Chợ Rẫy hoặc Việt Đức.',
+      'Hối thúc chuyển khoản ngay trong vòng 10 phút, nếu không "bác sĩ sẽ không phẫu thuật và nguy hiểm tính mạng".',
     ],
-    psychology: 'Kích hoạt nỗi sợ hãi tột cùng về sinh mạng người thân, khiến nạn nhân hoảng loạn, tê liệt khả năng tư duy logic và sẵn sàng dốc hết tiền tiết kiệm để cứu người.',
+    psychology: 'Đánh thẳng vào tình phụ tử, tình thân gia đình, tạo sự hoảng loạn tột độ khiến não bộ nạn nhân rơi vào trạng thái tê liệt lý trí, lập tức chuyển tiền mà không kịp suy xét.',
     redFlags: [
-      'Cuộc gọi video ngắn bất thường, hình ảnh rung nhòe, cử động miệng không khớp âm thanh.',
-      'Cấm gọi điện thoại kiểm tra, dặn giấu người nhà (sợ bố mẹ cao huyết áp ngất).',
-      'Viện phí nhưng bắt chuyển vào tài khoản cá nhân trôi nổi.',
+      'Cuộc gọi video ngắn bất thường, khuôn mặt méo mó, nhấp nháy khi cử động, giọng nói đều đều như robot.',
+      'Hối thúc chuyển tiền viện phí vào tài khoản cá nhân của "y tá/bác sĩ" thay vì tài khoản chính thức của bệnh viện.',
+      'Không chịu nghe lại cuộc gọi video mà chỉ nhắn tin liên tục.',
     ],
     defense: [
-      'Cúp máy ngay và gọi trực tiếp vào số SIM di động của người thân hoặc các thành viên khác trong gia đình.',
-      'Hỏi "câu hỏi bí mật" mà chỉ người trong nhà mới biết (tên thú cưng, kỷ niệm gia đình).',
-      'Gọi trực tiếp tới số tổng đài chính thức của bệnh viện để tra cứu danh sách bệnh nhân cấp cứu.',
-      'Lưu ý: Bệnh viện công lập luôn ưu tiên cứu chữa tính mạng trước, không bao giờ vì chưa có tiền tài khoản cá nhân mà bỏ mặc bệnh nhân.',
+      'Hỏi ngay một câu hỏi bí mật mà chỉ hai người trong gia đình biết (ví dụ: "Hôm qua nhà mình ăn món gì?", "Tên con cún ở quê là gì?").',
+      'Cúp máy và gọi điện thoại di động thông thường (sóng viễn thông) vào số máy gốc của người thân.',
+      'Gọi điện trực tiếp vào hotline tổng đài của bệnh viện để xác minh có bệnh nhân tên đó đang cấp cứu hay không.',
     ],
-    quote: '"Càng hoảng loạn kẻ gian càng dễ dắt mũi. Hãy hít sâu 3 giây và bấm gọi số SIM kiểm chứng!"',
+    quote: '"Trong cơn hoảng loạn, 1 phút dừng lại thở sâu và kiểm chứng sẽ cứu cả gia đình khỏi mất tiền oan!"',
   },
   {
-    id: 'task-scam',
-    scenarioId: 'sc3-tiktok-job',
-    title: 'Bẫy CTV Nhiệm Vụ Ảo Telegram & "Chi Phí Chìm"',
-    subtitle: 'Thả thính tiền thật, lôi kéo vào nhóm VIP rồi đóng băng tiền',
-    category: 'Lừa đảo nhiệm vụ & Thao túng chi phí chìm',
+    id: 'telegram-task',
+    scenarioId: 'sc3-telegram-task',
+    title: 'Bẫy Cộng Tác Viên Telegram: "Nhiệm Vụ Đơn Hàng Phúc Lợi"',
+    subtitle: 'Thao túng chi phí chìm (Sunk Cost) và bẫy Ponzi đóng tiền cứu vốn',
+    category: 'Lừa đảo việc làm trực tuyến',
     icon: '📈',
+    dangerLevel: 'Cực kỳ nguy hiểm',
+    badgeColor: 'bg-purple-600',
+    avatar: 'images/avatar_thu_trang.jpg',
+    summary: 'Tiếp cận học sinh qua TikTok/Facebook tuyển cộng tác viên xem video, thả tim hoặc đánh giá sản phẩm Shopee nhận lương 300k - 500k/ngày. Ban đầu trả hoa hồng thật 30k - 50k để tạo lòng tin, sau đó lôi kéo vào nhóm Telegram VIP làm "nhiệm vụ liên kết" bắt nạp tiền lớn rồi chiếm đoạt.',
+    tactics: [
+      'Tặng tiền hoa hồng thật ở 1-2 nhiệm vụ đầu tiên để nạn nhân tin là công việc có thật.',
+      'Dẫn dắt nạn nhân vào nhóm chat Telegram có 50 - 100 thành viên (thực chất toàn là "chim mồi" nick ảo của cùng một băng nhóm).',
+      'Đưa ra các đơn hàng giá trị cao (2 triệu, 5 triệu, 20 triệu) và yêu cầu nạp tiền để hưởng hoa hồng 30%.',
+      'Khi nạn nhân muốn rút tiền, hệ thống viện cớ "sai cú pháp lệnh", "chậm tiến độ", ép phải nạp thêm gấp đôi số tiền cũ để "cứu tiền treo".',
+    ],
+    psychology: 'Khai thác tâm lý muốn kiếm tiền tiêu vặt dễ dàng của học sinh, sau đó khóa chặt nạn nhân bằng bẫy "Chi phí chìm" (Sunk Cost Fallacy): vì tiếc số tiền đã nạp trước đó nên cắn răng vay mượn nạp thêm để mong lấy lại vốn.',
+    redFlags: [
+      'Công việc làm online nhưng bắt người lao động phải tự nạp tiền túi vào trước.',
+      'Trong nhóm chat Telegram, các thành viên liên tục khoe ảnh biên lai chuyển tiền thành công hàng chục triệu một cách đáng ngờ.',
+      'Khi rút tiền luôn có lý do phát sinh lỗi và bắt nộp thêm tiền phạt/phí bảo hiểm.',
+    ],
+    defense: [
+      'Khắc cốt ghi tâm: BẤT KỲ CÔNG VIỆC TUYỂN DỤNG NÀO YÊU CẦU NẠP TIỀN ĐỀU LÀ 100% LỪA ĐẢO.',
+      'Dừng nạp tiền ngay lập tức khi hệ thống báo lỗi, chấp nhận mất khoản tiền nhỏ ban đầu thay vì mất toàn bộ tài sản gia đình.',
+      'Chặn ngay các nhóm Telegram tuyển dụng và báo cáo tài khoản lừa đảo.',
+    ],
+    quote: '"Không có miếng phô mai nào miễn phí ngoài chiếc bẫy chuột. Càng nạp tiền cứu vốn là càng lún sâu vào đầm lầy!"',
+  },
+  {
+    id: 'vneid-trojan',
+    scenarioId: 'sc4-zalo-bca',
+    title: 'Giả Danh Cán Bộ VNeID Đề Án 06 Cài Trojan Chiếm Quyền',
+    subtitle: 'Dụ tải file .apk kích hoạt Accessibility trộm mã OTP ngân hàng',
+    category: 'Mã độc tống tiền & Trộm dữ liệu ngân hàng',
+    icon: '🏛️',
     dangerLevel: 'Đặc biệt nghiêm trọng',
     badgeColor: 'bg-amber-600',
-    avatar: 'images/avatar_thu_trang.jpg',
-    summary: 'Dụ dỗ học sinh làm CTV thả tim video hoặc đánh giá sản phẩm. Ban đầu chuyển khoản thật 30.000đ - 50.000đ để tạo niềm tin tuyệt đối, sau đó mời vào nhóm VIP Telegram và tung chiêu "sai cú pháp đóng băng tiền" để ép nạp tiền chuộc ngày càng lớn.',
-    tactics: [
-      'Dùng chiêu "thả con săn sắt": Chuyển khoản thật số tiền nhỏ ban đầu để nạn nhân tin là uy tín 100%.',
-      'Lôi kéo vào nhóm chat Telegram có sẵn hàng chục nick "chim mồi" (shills) liên tục khoe bill tiền về chục triệu.',
-      'Yêu cầu nạp đơn hàng trên trang web giả mạo do chúng tự lập trình (tên miền .vip, .cc).',
-      'Dàn cảnh "Lỗi cú pháp mã giao dịch", thông báo tiền bị treo tại cổng thanh toán.',
-      'Ép nạp bù lệnh gấp 2, gấp 5 lần trong vòng 10-15 phút để cứu lại số tiền trước đó.',
-    ],
-    psychology: 'Đánh vào Bẫy chi phí chìm (Sunk Cost Fallacy): Vì tiếc số tiền vài trăm nghìn đã nạp, nạn nhân cắn răng vay mượn hàng triệu, hàng chục triệu với hy vọng lấy lại được vốn.',
-    redFlags: [
-      'Việc làm đơn giản (thả tim, like video) nhưng cam kết thu nhập 300k - 1 triệu/ngày.',
-      'Nhóm Telegram chặn tin nhắn của thành viên, chỉ có vài tài khoản liên tục tung hứng.',
-      'Bắt đóng tiền/nạp tiền trước để làm nhiệm vụ.',
-      'Cái cớ "sai cú pháp", "lỗi hệ thống" và đe dọa mất tiền nếu không nạp bù ngay.',
-    ],
-    defense: [
-      'Quy tắc bất biến: BẤT KỲ CÔNG VIỆC NÀO YÊU CẦU NẠP TIỀN TRƯỚC = 100% LỪA ĐẢO.',
-      'Dũng cảm cắt lỗ: Nhận diện bẫy ngay khi bị báo lỗi và dừng lại, tuyệt đối không nạp thêm một xu nào.',
-      'Rời nhóm Telegram, chặn tài khoản và cảnh báo cho bạn bè cùng biết.',
-    ],
-    quote: '"Khoản tiền nạp vào bẫy nhiệm vụ sẽ không bao giờ rút ra được. Dừng lại sớm là giữ được tiền!"',
-  },
-  {
-    id: 'fake-app',
-    scenarioId: 'sc4-fake-app',
-    title: 'Mạo Danh Công An / Đề Án 06 & Mã Độc Chiếm Quyền Trợ Năng',
-    subtitle: 'Dọa hủy thi tốt nghiệp, dụ cài file APK đánh cắp tài khoản ngân hàng',
-    category: 'Mã độc di động & Tấn công phi kỹ thuật',
-    icon: '🛡️',
-    dangerLevel: 'Cực kỳ nguy hiểm',
-    badgeColor: 'bg-emerald-700',
     avatar: 'images/avatar_can_bo_bca.jpg',
-    summary: 'Tự xưng cán bộ Đề án 06 Bộ Công An thông báo hồ sơ định danh sinh trắc học VNeID của học sinh bị lệch năm sinh, đe dọa hủy tư cách thi chuyển cấp/tốt nghiệp. Hướng dẫn tải file APK giả mạo và lừa bật quyền Trợ năng (Accessibility) để chiếm quyền điều khiển điện thoại từ xa.',
+    summary: 'Kẻ gian đóng giả Cán bộ Công an phụ trách Đề án 06, gọi điện thông báo hồ sơ định danh điện tử VNeID mức 2 bị lỗi thông tin. Chúng hướng dẫn nạn nhân tải file ứng dụng .apk giả mạo Cổng Dịch vụ công để chiếm quyền Trợ năng (Accessibility Service) trên điện thoại Android, tự động theo dõi màn hình và trộm tiền ngân hàng trong đêm.',
     tactics: [
-      'Gửi công văn hỏa tốc có Quốc huy, tiêu ngữ và dấu đỏ scan giả mạo.',
-      'Đe dọa khóa mã dự thi tốt nghiệp nếu không cập nhật trước mốc giờ nhất định (ép thời gian trong ngày).',
-      'Gửi link tải file cài đặt CongDichVuCong_v2.apk từ tên miền rác .vip.',
-      'Dụ bật quyền Trợ năng (Accessibility Service) và Đọc SMS với lý do "để AI của Bộ Công an quét mặt đồng bộ".',
-      'Sau khi bật, mã độc làm tối màn hình nạn nhân, âm thầm mở app ngân hàng, đọc trộm mã OTP và vét sạch tiền.',
+      'Đọc chính xác họ tên, số CCCD, ngày sinh của nạn nhân để tạo uy tín tuyệt đối (dữ liệu thu thập từ các vụ lộ lọt thông tin trên mạng).',
+      'Đe dọa sẽ khóa tài khoản định danh, phạt tiền hoặc cưỡng chế nếu không cập nhật thông tin trong ngày.',
+      'Gửi đường link giả mạo có giao diện giống hệt Cổng Dịch vụ công Quốc gia để tải file cài đặt (ví dụ: `dichvucong.apk`).',
+      'Hướng dẫn nạn nhân vào cài đặt máy bật quyền "Trợ năng" (Accessibility Service) và quyền "Hiển thị trên ứng dụng khác".',
     ],
-    psychology: 'Lợi dụng tâm lý sợ hãi bị kỷ luật, sợ bị đình chỉ thi và uy quyền của lực lượng công an để ép nạn nhân tuân lệnh một cách mù quáng.',
+    psychology: 'Lợi dụng tâm lý sợ hãi trước cơ quan pháp luật, sợ bị phạt và tính cả tin của người dân vào những thủ tục hành chính số mới triển khai.',
     redFlags: [
-      'Công an KHÔNG BAO GIỜ làm việc hoặc yêu cầu chỉnh sửa hồ sơ qua tin nhắn Zalo cá nhân.',
-      'Đường link có đuôi lạ (.vip, .cc, .top) thay vì tên miền chuẩn của cơ quan nhà nước (.gov.vn).',
-      'Bắt tải file .apk cài ngoài kho ứng dụng Google Play / App Store.',
-      'Đòi cấp quyền "Trợ năng" (Accessibility) - quyền kiểm soát tối cao của hệ điều hành Android.',
+      'Cán bộ Công an gọi điện thoại hoặc nhắn tin qua Zalo yêu cầu tải phần mềm.',
+      'Ứng dụng không tải từ Google Play Store / Apple App Store mà tải qua đường link lạ đuôi `.apk`.',
+      'Ứng dụng đòi quyền "Trợ năng" (Accessibility) — quyền lực nhất trên Android cho phép ứng dụng đọc màn hình và tự bấm nút.',
     ],
     defense: [
-      'Mọi thông tin chỉnh sửa dữ liệu dân cư BẮT BUỘC phải ra trực tiếp trụ sở Công an Phường/Xã.',
-      'Tuyệt đối KHÔNG cài đặt bất kỳ file .apk nào được gửi qua tin nhắn mạng xã hội.',
-      'Nếu lỡ cài đặt: Lập tức ngắt kết nối Wi-Fi/4G, tắt nguồn điện thoại, dùng máy khác đổi mật khẩu ngân hàng và ra trung tâm bảo hành khôi phục cài đặt gốc.',
+      'Nguyên tắc bất di bất dịch: Cơ quan Công an TUYỆT ĐỐI KHÔNG làm việc, hướng dẫn cài đặt phần mềm qua điện thoại hay Zalo.',
+      'Mọi thủ tục định danh VNeID mức 2 bắt buộc phải đến trực tiếp Công an phường/xã nơi cư trú.',
+      'Tuyệt đối không bao giờ cài file `.apk` từ nguồn bên ngoài và không bật quyền Trợ năng cho bất kỳ app lạ nào.',
     ],
-    quote: '"Cơ quan nhà nước chỉ tiếp dân tại trụ sở. Không ai hướng dẫn cập nhật định danh qua Zalo!"',
+    quote: '"Cấp quyền Trợ năng cho file apk lạ cũng giống như trao chìa khóa két sắt của bạn cho kẻ trộm!"',
   },
   {
     id: 'border-job',
-    scenarioId: 'sc5-abroad-job',
-    title: 'Bẫy Việc Làm "CSKH Mộc Bài" & Cạm Bẫy Buôn Người',
-    subtitle: 'Vỏ bọc KCN Tây Ninh, xe đón đêm đưa thẳng qua biên giới sòng bạc',
-    category: 'Mua bán người & Cưỡng bức lao động',
-    icon: '🚨',
+    scenarioId: 'sc5-job-scam',
+    title: 'Việc Nhẹ Lương Cao KCN Mộc Bài: Bẫy Buôn Người Biên Giới',
+    subtitle: 'Đài thọ toàn bộ chi phí để bắt cóc ép làm việc lừa đảo tại Campuchia',
+    category: 'Tội phạm buôn bán người xuyên biên giới',
+    icon: '⚠️',
     dangerLevel: 'Cực kỳ nguy hiểm',
-    badgeColor: 'bg-purple-700',
+    badgeColor: 'bg-red-700',
     avatar: 'images/avatar_hoang_long.jpg',
-    summary: 'Đăng tin tuyển dụng nhân viên văn phòng trực chat game online tại Khu kinh tế Cửa khẩu Mộc Bài - Tây Ninh với lương 18-25 triệu/tháng, bao ăn ở máy lạnh. Thực chất hẹn xe 16 chỗ đón đêm để chở thẳng nạn nhân qua đường tiểu ngạch sang các sòng bạc Campuchia để giam giữ, tra tấn và tống tiền chuộc.',
+    summary: 'Đăng tin tuyển dụng nhân viên trực chat, đánh máy, chăm sóc khách hàng game tại cửa khẩu Mộc Bài Tây Ninh với mức lương 25 - 40 triệu/tháng. Hứa hẹn đài thọ vé xe, không cần bằng cấp. Khi nạn nhân đến nơi, chúng đưa qua đường mòn biên giới sang Campuchia, nhốt trong các đặc khu lừa đảo, đánh đập và tống tiền chuộc gia đình.',
     tactics: [
-      'Ngụy trang địa điểm làm việc tại các KCN giáp ranh biên giới (Mộc Bài, Long An, Bình Phước) để nạn nhân không phòng bị.',
-      'Hứa hẹn mức lương 18 - 25 triệu/tháng chỉ để ngồi máy lạnh gõ phím, cam kết "thử việc 2 ngày không thích thì về".',
-      'Hẹn xe đón ban đêm (21h - 22h) bằng xe 16 chỗ kính tối màu tại các bến xe hoặc cây xăng vắng.',
-      'Dặn dứt khoát KHÔNG ĐƯỢC kể cho bố mẹ, bạn bè (lấy cớ suất tuyển nội bộ).',
-      'Yêu cầu mang theo CCCD gốc: ngay khi lên xe hoặc qua biên giới sẽ bị tịch thu toàn bộ giấy tờ và điện thoại.',
+      'Vẽ ra bức tranh việc nhẹ lương cao: chỉ ngồi gõ máy tính văn phòng, bao ăn ở khách sạn, lương khởi điểm 1.000 USD.',
+      'Hào phóng đài thọ toàn bộ chi phí di chuyển: chuyển khoản tiền xe bus, vé máy bay hoặc cho xe riêng đến tận nhà đón.',
+      'Yêu cầu nạn nhân giữ bí mật với gia đình vì "chính sách công ty bảo mật".',
+      'Khi xe đến Tây Ninh, chúng đổi sang xe máy hoặc đi bộ vượt biên giới qua đường tiểu ngạch ban đêm để tránh cửa khẩu chính thức.',
     ],
-    psychology: 'Đánh trúng khao khát kiếm tiền nhanh của học sinh mới tốt nghiệp, thiếu kiến thức xã hội và dễ bị dụ dỗ bởi chiêu bài "việc nhẹ lương cao - bao trọn gói".',
+    psychology: 'Khai thác hoàn cảnh khó khăn, tâm lý muốn tự lập sớm của học sinh nghèo hoặc sự bất mãn với gia đình, tạo cảm giác được công ty trân trọng và chào đón nồng nhiệt.',
     redFlags: [
-      'Công việc lao động phổ thông, không bằng cấp nhưng trả lương cao hơn cả cử nhân đại học.',
-      'Không có hợp đồng lao động, không có số nhà trụ sở rõ ràng tại Việt Nam.',
+      'Việc làm phổ thông không yêu cầu kinh nghiệm, bằng cấp nhưng trả lương cao hơn cả cử nhân đại học (30 - 50 triệu/tháng).',
+      'Địa điểm làm việc mập mờ, sát biên giới Tây Ninh, Mộc Bài, Campuchia, Lào.',
       'Dặn dò giấu giếm gia đình, hẹn đón ban đêm tại các điểm gom người bất thường.',
     ],
     defense: [
@@ -179,8 +172,9 @@ const TOPICS: ScamTopic[] = [
   },
 ]
 
-export default function Handbook({ onStartGame, onPickScenario }: { onStartGame: () => void; onPickScenario: (id: string) => void }) {
+export default function Handbook({ onStartGame }: { onStartGame: () => void }) {
   const [searchTerm, setSearchTerm] = useState('')
+  const [detailTopic, setDetailTopic] = useState<ScamTopic | null>(null)
 
   const filtered = TOPICS.filter((t) =>
     t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -215,7 +209,7 @@ export default function Handbook({ onStartGame, onPickScenario }: { onStartGame:
               <span>→</span>
             </button>
             <span className="text-xs text-slate-400">
-              ⚡ Mô phỏng thực tế 100% tình huống thực chiến
+              ⚡ Nhấn vào từng chiêu trò bên dưới để xem phân tích chi tiết
             </span>
           </div>
         </div>
@@ -265,7 +259,7 @@ export default function Handbook({ onStartGame, onPickScenario }: { onStartGame:
               <span className="rounded-full bg-indigo-100 text-indigo-700 text-xs px-2.5 py-0.5 font-bold">{filtered.length} chuyên đề</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mt-1">
-              Nhận diện thủ đoạn, đòn bẫy tâm lý và dấu hiệu cảnh giác trước các cạm bẫy:
+              Nhấn vào từng chiêu trò để xem phân tích chi tiết thủ đoạn, đòn tâm lý và cách phòng vệ:
             </p>
           </div>
 
@@ -293,7 +287,8 @@ export default function Handbook({ onStartGame, onPickScenario }: { onStartGame:
           {filtered.map((topic, i) => (
             <div
               key={topic.id}
-              className="flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              onClick={() => setDetailTopic(topic)}
+              className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
             >
               <div>
                 {/* Header Top Bar */}
@@ -313,13 +308,13 @@ export default function Handbook({ onStartGame, onPickScenario }: { onStartGame:
                     <img
                       src={topic.avatar}
                       alt={topic.title}
-                      className="h-14 w-14 rounded-full object-cover shrink-0 border-2 border-white shadow-md ring-2 ring-slate-100"
+                      className="h-14 w-14 rounded-full object-cover shrink-0 border-2 border-white shadow-md ring-2 ring-slate-100 group-hover:scale-105 transition-transform"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="text-[11px] font-bold text-indigo-600">
                         Chuyên đề {i + 1}
                       </div>
-                      <h3 className="font-extrabold text-base text-slate-900 leading-snug mt-0.5">
+                      <h3 className="font-extrabold text-base text-slate-900 leading-snug mt-0.5 group-hover:text-indigo-600 transition-colors">
                         {topic.title}
                       </h3>
                       <p className="text-xs text-slate-500 mt-1 line-clamp-1">
@@ -328,35 +323,20 @@ export default function Handbook({ onStartGame, onPickScenario }: { onStartGame:
                     </div>
                   </div>
 
-                  <p className="mt-3.5 text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
+                  <p className="mt-3.5 text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed line-clamp-3">
                     {topic.summary}
                   </p>
 
-                  {/* Red flags */}
+                  {/* Red flags snippet */}
                   <div className="mt-4">
                     <div className="text-[11px] font-bold uppercase tracking-wider text-red-600 flex items-center gap-1">
-                      <span>🚩 Dấu hiệu nhận biết:</span>
+                      <span>🚩 Dấu hiệu nhận diện chính:</span>
                     </div>
                     <ul className="mt-1.5 space-y-1 text-xs text-slate-700">
                       {topic.redFlags.slice(0, 2).map((rf, rfi) => (
                         <li key={rfi} className="flex items-start gap-1.5">
                           <span className="text-red-500 font-bold shrink-0">•</span>
-                          <span className="line-clamp-2">{rf}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Golden defense */}
-                  <div className="mt-3">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1">
-                      <span>🛡️ Biện pháp phòng vệ:</span>
-                    </div>
-                    <ul className="mt-1.5 space-y-1 text-xs text-slate-700">
-                      {topic.defense.slice(0, 2).map((df, dfi) => (
-                        <li key={dfi} className="flex items-start gap-1.5">
-                          <span className="text-emerald-600 font-bold shrink-0">✓</span>
-                          <span className="line-clamp-2">{df}</span>
+                          <span className="line-clamp-1">{rf}</span>
                         </li>
                       ))}
                     </ul>
@@ -369,13 +349,16 @@ export default function Handbook({ onStartGame, onPickScenario }: { onStartGame:
                 </div>
               </div>
 
-              {/* Action Button */}
+              {/* Action Button: XEM CHI TIẾT */}
               <div className="border-t border-slate-100 bg-slate-50/70 p-4">
                 <button
-                  onClick={() => onPickScenario(topic.scenarioId)}
-                  className="w-full rounded-xl bg-slate-900 hover:bg-slate-800 py-2.5 px-4 text-center text-xs font-bold text-white shadow-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setDetailTopic(topic)
+                  }}
+                  className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 py-2.5 px-4 text-center text-xs font-bold text-white shadow-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
-                  <span>🎮 Trải nghiệm kịch bản này trong Tàn Ảo</span>
+                  <span>📖 Xem chi tiết chiêu trò</span>
                   <span>→</span>
                 </button>
               </div>
@@ -383,6 +366,150 @@ export default function Handbook({ onStartGame, onPickScenario }: { onStartGame:
           ))}
         </div>
       </div>
-      </div>
+
+      {/* Modal Popup: Xem Chi Tiết Chiêu Trò */}
+      {detailTopic && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in duration-200"
+          onClick={() => setDetailTopic(null)}
+        >
+          <div
+            className="relative my-8 w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Top Bar */}
+            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-6 py-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{detailTopic.icon}</span>
+                <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                  {detailTopic.category}
+                </span>
+                <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold text-white ${detailTopic.badgeColor}`}>
+                  {detailTopic.dangerLevel}
+                </span>
+              </div>
+              <button
+                onClick={() => setDetailTopic(null)}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200/80 hover:bg-slate-300 text-slate-700 transition font-bold"
+                title="Đóng (Esc)"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="max-h-[75vh] overflow-y-auto p-6 sm:p-8 space-y-6">
+              {/* Title & Avatar */}
+              <div className="flex items-start gap-4 pb-4 border-b border-slate-100">
+                <img
+                  src={detailTopic.avatar}
+                  alt={detailTopic.title}
+                  className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl object-cover border-2 border-slate-200 shadow-md shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
+                    {detailTopic.title}
+                  </h2>
+                  <p className="mt-1 text-xs sm:text-sm font-semibold text-indigo-600">
+                    {detailTopic.subtitle}
+                  </p>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div>
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                  📝 Tóm tắt kịch bản:
+                </div>
+                <p className="text-xs sm:text-sm text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100 leading-relaxed">
+                  {detailTopic.summary}
+                </p>
+              </div>
+
+              {/* Psychological Trap */}
+              <div className="rounded-2xl bg-rose-50/70 p-4 sm:p-5 border border-rose-100">
+                <div className="text-xs font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1.5">
+                  <span>🧠 Đòn bẫy thao túng tâm lý của tội phạm:</span>
+                </div>
+                <p className="mt-2 text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
+                  {detailTopic.psychology}
+                </p>
+              </div>
+
+              {/* Tactics */}
+              <div>
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                  <span>🎭 Thủ đoạn kịch bản thường gặp:</span>
+                </div>
+                <ul className="mt-2.5 space-y-2 text-xs sm:text-sm text-slate-700">
+                  {detailTopic.tactics.map((tac, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-[11px] font-bold text-slate-700 mt-0.5">
+                        {idx + 1}
+                      </span>
+                      <span className="leading-relaxed">{tac}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Red Flags */}
+              <div>
+                <div className="text-xs font-bold uppercase tracking-wider text-red-700 flex items-center gap-1.5">
+                  <span>🚩 Dấu hiệu nhận biết (Red Flags):</span>
+                </div>
+                <div className="mt-2.5 space-y-2">
+                  {detailTopic.redFlags.map((flag, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-2.5 rounded-xl bg-red-50/80 p-3 text-xs sm:text-sm text-red-900 border border-red-100"
+                    >
+                      <span className="shrink-0 font-bold text-red-600">⚠️</span>
+                      <span className="leading-relaxed">{flag}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Defense Strategy */}
+              <div>
+                <div className="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+                  <span>🛡️ Biện pháp phòng vệ chuẩn mực:</span>
+                </div>
+                <div className="mt-2.5 space-y-2">
+                  {detailTopic.defense.map((def, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-start gap-2.5 rounded-xl bg-emerald-50/80 p-3 text-xs sm:text-sm text-emerald-950 border border-emerald-100"
+                    >
+                      <span className="shrink-0 font-bold text-emerald-600">✓</span>
+                      <span className="leading-relaxed font-medium">{def}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quote */}
+              <div className="rounded-2xl border-l-4 border-indigo-600 bg-indigo-50/60 p-4 text-xs sm:text-sm italic font-semibold text-indigo-950">
+                {detailTopic.quote}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/80 px-6 py-4">
+              <span className="text-xs text-slate-500">
+                Đọc kỹ dấu hiệu để không bao giờ sập bẫy lừa đảo
+              </span>
+              <button
+                onClick={() => setDetailTopic(null)}
+                className="rounded-xl bg-slate-900 hover:bg-slate-800 px-6 py-2.5 text-xs sm:text-sm font-bold text-white shadow-xs transition active:scale-95"
+              >
+                ✕ Đóng chi tiết
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
