@@ -179,11 +179,11 @@ type Props = {
 
 export default function Handbook({ onStartGame, onOpenChat }: Props) {
   const [searchTerm, setSearchTerm] = useState('')
-  const [detailTopic, setDetailTopic] = useState<ScamTopic | null>(null)
 
   const filtered = TOPICS.filter((t) =>
     t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    t.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.summary.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
@@ -308,7 +308,7 @@ export default function Handbook({ onStartGame, onOpenChat }: Props) {
                 </div>
 
                 {/* Main Card Content */}
-                <div className="p-5">
+                <div className="p-5 flex-1 flex flex-col justify-between">
                   <div className="flex items-start gap-3.5">
                     <img
                       src={topic.avatar}
@@ -322,227 +322,31 @@ export default function Handbook({ onStartGame, onOpenChat }: Props) {
                       <h3 className="font-extrabold text-base text-slate-900 leading-snug mt-0.5 group-hover:text-indigo-600 transition-colors">
                         {topic.title}
                       </h3>
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-1">
+                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">
                         {topic.subtitle}
                       </p>
                     </div>
                   </div>
-
-                  <p className="mt-3.5 text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed line-clamp-3">
-                    {topic.summary}
-                  </p>
-
-                  {/* Red flags snippet */}
-                  <div className="mt-4">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-red-600 flex items-center gap-1">
-                      <span>🚩 Dấu hiệu nhận diện chính:</span>
-                    </div>
-                    <ul className="mt-1.5 space-y-1 text-xs text-slate-700">
-                      {topic.redFlags.slice(0, 2).map((rf, rfi) => (
-                        <li key={rfi} className="flex items-start gap-1.5">
-                          <span className="text-red-500 font-bold shrink-0">•</span>
-                          <span className="line-clamp-1">{rf}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Quote */}
-                  <div className="mt-3.5 rounded-xl border-l-3 border-indigo-500 bg-indigo-50/60 p-2.5 text-[11px] italic font-medium text-indigo-950">
-                    {topic.quote}
-                  </div>
                 </div>
               </div>
 
-              {/* Action Buttons: MỞ ĐOẠN CHAT THỰC TẾ & XEM PHÂN TÍCH */}
-              <div className="border-t border-slate-100 bg-slate-50/70 p-4 space-y-2">
+              {/* Action Button: MỞ ĐOẠN CHAT THỰC TẾ */}
+              <div className="border-t border-slate-100 bg-slate-50/70 p-4">
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
                     onOpenChat(topic.scenarioId)
                   }}
-                  className="w-full rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 py-2.5 px-4 text-center text-xs font-bold text-white shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="w-full rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 py-3 px-4 text-center text-xs sm:text-sm font-bold text-white shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 group-hover:shadow-md"
                 >
                   <span>💬 Mở đoạn chat thực tế</span>
                   <span>→</span>
-                </button>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setDetailTopic(topic)
-                  }}
-                  className="w-full rounded-xl border border-slate-200 bg-white hover:bg-slate-100 py-1.5 px-3 text-center text-[11px] font-semibold text-slate-600 transition"
-                >
-                  📖 Xem lý thuyết phân tích
                 </button>
               </div>
             </div>
           ))}
         </div>
       </div>
-
-      {/* Modal Popup: Xem Chi Tiết Chiêu Trò */}
-      {detailTopic && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in duration-200"
-          onClick={() => setDetailTopic(null)}
-        >
-          <div
-            className="relative my-8 w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-200"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Top Bar */}
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-6 py-4">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{detailTopic.icon}</span>
-                <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
-                  {detailTopic.category}
-                </span>
-                <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold text-white ${detailTopic.badgeColor}`}>
-                  {detailTopic.dangerLevel}
-                </span>
-              </div>
-              <button
-                onClick={() => setDetailTopic(null)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200/80 hover:bg-slate-300 text-slate-700 transition font-bold"
-                title="Đóng (Esc)"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="max-h-[75vh] overflow-y-auto p-6 sm:p-8 space-y-6">
-              {/* Title & Avatar */}
-              <div className="flex items-start gap-4 pb-4 border-b border-slate-100">
-                <img
-                  src={detailTopic.avatar}
-                  alt={detailTopic.title}
-                  className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl object-cover border-2 border-slate-200 shadow-md shrink-0"
-                />
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
-                    {detailTopic.title}
-                  </h2>
-                  <p className="mt-1 text-xs sm:text-sm font-semibold text-indigo-600">
-                    {detailTopic.subtitle}
-                  </p>
-                </div>
-              </div>
-
-              {/* Action Button inside Modal */}
-              <div className="rounded-2xl bg-indigo-50/80 p-4 border border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="text-xs text-indigo-900 font-medium">
-                  Bạn muốn quan sát trực tiếp đoạn tin nhắn và cách thức kẻ gian giăng bẫy?
-                </div>
-                <button
-                  onClick={() => {
-                    const id = detailTopic.scenarioId
-                    setDetailTopic(null)
-                    onOpenChat(id)
-                  }}
-                  className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-5 py-2.5 text-xs font-bold text-white shadow-md transition active:scale-95"
-                >
-                  <span>💬 Mở đoạn chat thực tế</span>
-                  <span>→</span>
-                </button>
-              </div>
-
-              {/* Summary */}
-              <div>
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
-                  📝 Tóm tắt kịch bản:
-                </div>
-                <p className="text-xs sm:text-sm text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100 leading-relaxed">
-                  {detailTopic.summary}
-                </p>
-              </div>
-
-              {/* Psychological Trap */}
-              <div className="rounded-2xl bg-rose-50/70 p-4 sm:p-5 border border-rose-100">
-                <div className="text-xs font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1.5">
-                  <span>🧠 Đòn bẫy thao túng tâm lý của tội phạm:</span>
-                </div>
-                <p className="mt-2 text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
-                  {detailTopic.psychology}
-                </p>
-              </div>
-
-              {/* Tactics */}
-              <div>
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
-                  <span>🎭 Thủ đoạn kịch bản thường gặp:</span>
-                </div>
-                <ul className="mt-2.5 space-y-2 text-xs sm:text-sm text-slate-700">
-                  {detailTopic.tactics.map((tac, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-[11px] font-bold text-slate-700 mt-0.5">
-                        {idx + 1}
-                      </span>
-                      <span className="leading-relaxed">{tac}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Red Flags */}
-              <div>
-                <div className="text-xs font-bold uppercase tracking-wider text-red-700 flex items-center gap-1.5">
-                  <span>🚩 Dấu hiệu nhận biết (Red Flags):</span>
-                </div>
-                <div className="mt-2.5 space-y-2">
-                  {detailTopic.redFlags.map((flag, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-2.5 rounded-xl bg-red-50/80 p-3 text-xs sm:text-sm text-red-900 border border-red-100"
-                    >
-                      <span className="shrink-0 font-bold text-red-600">⚠️</span>
-                      <span className="leading-relaxed">{flag}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Defense Strategy */}
-              <div>
-                <div className="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
-                  <span>🛡️ Biện pháp phòng vệ chuẩn mực:</span>
-                </div>
-                <div className="mt-2.5 space-y-2">
-                  {detailTopic.defense.map((def, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-2.5 rounded-xl bg-emerald-50/80 p-3 text-xs sm:text-sm text-emerald-950 border border-emerald-100"
-                    >
-                      <span className="shrink-0 font-bold text-emerald-600">✓</span>
-                      <span className="leading-relaxed font-medium">{def}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quote */}
-              <div className="rounded-2xl border-l-4 border-indigo-600 bg-indigo-50/60 p-4 text-xs sm:text-sm italic font-semibold text-indigo-950">
-                {detailTopic.quote}
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/80 px-6 py-4">
-              <span className="text-xs text-slate-500">
-                Đọc kỹ dấu hiệu để không bao giờ sập bẫy lừa đảo
-              </span>
-              <button
-                onClick={() => setDetailTopic(null)}
-                className="rounded-xl bg-slate-900 hover:bg-slate-800 px-6 py-2.5 text-xs sm:text-sm font-bold text-white shadow-xs transition active:scale-95"
-              >
-                ✕ Đóng chi tiết
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
