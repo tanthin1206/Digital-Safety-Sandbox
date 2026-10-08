@@ -180,7 +180,6 @@ const TOPICS: ScamTopic[] = [
 ]
 
 export default function Handbook({ onStartGame, onPickScenario }: { onStartGame: () => void; onPickScenario: (id: string) => void }) {
-  const [selectedTopic, setSelectedTopic] = useState<ScamTopic>(TOPICS[0])
   const [searchTerm, setSearchTerm] = useState('')
 
   const filtered = TOPICS.filter((t) =>
@@ -257,22 +256,25 @@ export default function Handbook({ onStartGame, onPickScenario }: { onStartGame:
         </div>
       </div>
 
-      {/* Main Content Layout: Left Sidebar + Right Reader */}
-      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-12">
-        {/* Left Navigation: List of scam topics */}
-        <div className="lg:col-span-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">
-              Danh sách chiêu trò ({filtered.length})
+      {/* 5 Hình thức lừa đảo - Dàn hàng ngang đa cột */}
+      <div className="mt-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200 pb-4">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2">
+              <span>🛡️ Danh Sách 5 Chiêu Trò Lừa Đảo Phổ Biến</span>
+              <span className="rounded-full bg-indigo-100 text-indigo-700 text-xs px-2.5 py-0.5 font-bold">{filtered.length} chuyên đề</span>
             </h2>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              Nhận diện thủ đoạn, đòn bẫy tâm lý và dấu hiệu cảnh giác trước các cạm bẫy:
+            </p>
           </div>
 
-          <div className="relative">
+          <div className="relative w-full sm:w-72">
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="🔍 Tìm kiếm chiêu trò lừa đảo..."
+              placeholder="🔍 Tìm kiếm chiêu trò..."
               className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 shadow-xs focus:border-indigo-500 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
             />
             {searchTerm && (
@@ -284,150 +286,103 @@ export default function Handbook({ onStartGame, onPickScenario }: { onStartGame:
               </button>
             )}
           </div>
-
-          <div className="space-y-2">
-            {filtered.map((topic, i) => {
-              const active = selectedTopic.id === topic.id
-              return (
-                <button
-                  key={topic.id}
-                  onClick={() => setSelectedTopic(topic)}
-                  className={`w-full text-left rounded-2xl border p-4 transition-all duration-200 flex items-start gap-3.5 ${
-                    active
-                      ? 'border-indigo-600 bg-white shadow-md ring-2 ring-indigo-500/20'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 shadow-xs'
-                  }`}
-                >
-                  <img
-                    src={topic.avatar}
-                    alt={topic.title}
-                    className="h-12 w-12 rounded-full object-cover shrink-0 border border-slate-200 shadow-xs"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
-                      <span>{topic.icon}</span>
-                      <span className="truncate">{topic.category}</span>
-                    </div>
-                    <h3 className={`mt-0.5 font-bold text-sm leading-snug ${active ? 'text-indigo-900' : 'text-slate-900'}`}>
-                      {i + 1}. {topic.title}
-                    </h3>
-                    <div className="mt-1.5 flex items-center gap-2">
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold text-white ${topic.badgeColor}`}>
-                        {topic.dangerLevel}
-                      </span>
-                    </div>
-                  </div>
-                </button>
-              )
-            })}
-          </div>
         </div>
 
-        {/* Right Reader: Deep Dive into Selected Topic */}
-        <div className="lg:col-span-8">
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-            {/* Header info */}
-            <div className="border-b border-slate-100 pb-5">
-              <div className="flex items-center gap-2">
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold text-white ${selectedTopic.badgeColor}`}>
-                  {selectedTopic.dangerLevel}
-                </span>
-                <span className="text-xs font-semibold text-slate-500">
-                  Phân loại: {selectedTopic.category}
-                </span>
-              </div>
-              <h2 className="mt-2 text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
-                {selectedTopic.title}
-              </h2>
-              <p className="mt-1 text-sm font-medium text-indigo-600">
-                {selectedTopic.subtitle}
-              </p>
-            </div>
+        {/* Grid cards dàn hàng ngang */}
+        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((topic, i) => (
+            <div
+              key={topic.id}
+              className="flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+            >
+              <div>
+                {/* Header Top Bar */}
+                <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-5 py-3">
+                  <span className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+                    <span>{topic.icon}</span>
+                    <span className="truncate">{topic.category}</span>
+                  </span>
+                  <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold text-white ${topic.badgeColor}`}>
+                    {topic.dangerLevel}
+                  </span>
+                </div>
 
-            {/* Quick summary & Quote */}
-            <div className="mt-5 space-y-4">
-              <p className="text-sm text-slate-700 leading-relaxed font-normal bg-slate-50 p-4 rounded-xl border border-slate-100">
-                {selectedTopic.summary}
-              </p>
-
-              <blockquote className="rounded-xl border-l-4 border-indigo-600 bg-indigo-50/50 p-3.5 text-xs italic font-semibold text-indigo-950">
-                {selectedTopic.quote}
-              </blockquote>
-            </div>
-
-            {/* Psychological manipulation */}
-            <div className="mt-6">
-              <h4 className="flex items-center gap-2 font-bold text-sm uppercase tracking-wide text-slate-800">
-                <span>🧠 Đòn bẫy tâm lý của tội phạm</span>
-              </h4>
-              <p className="mt-2 text-xs sm:text-sm text-slate-700 leading-relaxed bg-rose-50/70 p-3.5 rounded-xl border border-rose-100 text-rose-950">
-                {selectedTopic.psychology}
-              </p>
-            </div>
-
-            {/* Common Tactics */}
-            <div className="mt-6">
-              <h4 className="flex items-center gap-2 font-bold text-sm uppercase tracking-wide text-slate-800">
-                <span>🎭 Thủ đoạn kịch bản thường gặp</span>
-              </h4>
-              <ul className="mt-2.5 space-y-2 text-xs sm:text-sm text-slate-700">
-                {selectedTopic.tactics.map((tac, idx) => (
-                  <li key={idx} className="flex items-start gap-2.5">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-[11px] font-bold text-slate-700 mt-0.5">
-                      {idx + 1}
-                    </span>
-                    <span>{tac}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Red Flags Signs */}
-            <div className="mt-6">
-              <h4 className="flex items-center gap-2 font-bold text-sm uppercase tracking-wide text-red-700">
-                <span>🚩 Dấu hiệu nhận biết (Red Flags)</span>
-              </h4>
-              <div className="mt-2.5 space-y-2">
-                {selectedTopic.redFlags.map((flag, idx) => (
-                  <div key={idx} className="flex items-start gap-2 rounded-xl bg-red-50/80 p-3 text-xs sm:text-sm text-red-900 border border-red-100">
-                    <span className="shrink-0 font-bold text-red-600">⚠️</span>
-                    <span>{flag}</span>
+                {/* Main Card Content */}
+                <div className="p-5">
+                  <div className="flex items-start gap-3.5">
+                    <img
+                      src={topic.avatar}
+                      alt={topic.title}
+                      className="h-14 w-14 rounded-full object-cover shrink-0 border-2 border-white shadow-md ring-2 ring-slate-100"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[11px] font-bold text-indigo-600">
+                        Chuyên đề {i + 1}
+                      </div>
+                      <h3 className="font-extrabold text-base text-slate-900 leading-snug mt-0.5">
+                        {topic.title}
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1 line-clamp-1">
+                        {topic.subtitle}
+                      </p>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            {/* Defense Strategy */}
-            <div className="mt-6">
-              <h4 className="flex items-center gap-2 font-bold text-sm uppercase tracking-wide text-emerald-700">
-                <span>🛡️ Biện pháp phòng vệ chuẩn mực</span>
-              </h4>
-              <div className="mt-2.5 space-y-2">
-                {selectedTopic.defense.map((def, idx) => (
-                  <div key={idx} className="flex items-start gap-2 rounded-xl bg-emerald-50/80 p-3 text-xs sm:text-sm text-emerald-950 border border-emerald-100">
-                    <span className="shrink-0 font-bold text-emerald-600">✓</span>
-                    <span>{def}</span>
+                  <p className="mt-3.5 text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed">
+                    {topic.summary}
+                  </p>
+
+                  {/* Red flags */}
+                  <div className="mt-4">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-red-600 flex items-center gap-1">
+                      <span>🚩 Dấu hiệu nhận biết:</span>
+                    </div>
+                    <ul className="mt-1.5 space-y-1 text-xs text-slate-700">
+                      {topic.redFlags.slice(0, 2).map((rf, rfi) => (
+                        <li key={rfi} className="flex items-start gap-1.5">
+                          <span className="text-red-500 font-bold shrink-0">•</span>
+                          <span className="line-clamp-2">{rf}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            {/* Practice in Tan Ao Button */}
-            <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-xs text-slate-500">
-                Bạn đã nắm rõ lý thuyết? Hãy thử sức đối mặt trực tiếp với kẻ lừa đảo trong trò chơi!
+                  {/* Golden defense */}
+                  <div className="mt-3">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1">
+                      <span>🛡️ Biện pháp phòng vệ:</span>
+                    </div>
+                    <ul className="mt-1.5 space-y-1 text-xs text-slate-700">
+                      {topic.defense.slice(0, 2).map((df, dfi) => (
+                        <li key={dfi} className="flex items-start gap-1.5">
+                          <span className="text-emerald-600 font-bold shrink-0">✓</span>
+                          <span className="line-clamp-2">{df}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Quote */}
+                  <div className="mt-3.5 rounded-xl border-l-3 border-indigo-500 bg-indigo-50/60 p-2.5 text-[11px] italic font-medium text-indigo-950">
+                    {topic.quote}
+                  </div>
+                </div>
               </div>
-              <button
-                onClick={() => onPickScenario(selectedTopic.scenarioId)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-xs sm:text-sm font-bold text-white shadow-md transition hover:bg-slate-800 active:scale-95"
-              >
-                <span>🎮 Vào thực chiến trong Tàn Ảo</span>
-                <span>→</span>
-              </button>
+
+              {/* Action Button */}
+              <div className="border-t border-slate-100 bg-slate-50/70 p-4">
+                <button
+                  onClick={() => onPickScenario(topic.scenarioId)}
+                  className="w-full rounded-xl bg-slate-900 hover:bg-slate-800 py-2.5 px-4 text-center text-xs font-bold text-white shadow-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                >
+                  <span>🎮 Trải nghiệm kịch bản này trong Tàn Ảo</span>
+                  <span>→</span>
+                </button>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
-    </div>
+      </div>
   )
 }
