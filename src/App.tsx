@@ -3,6 +3,10 @@ import Menu from './pages/Menu'
 import Teacher from './pages/Teacher'
 import Handbook from './pages/Handbook'
 import AiGuard from './pages/AiGuard'
+import Play from './pages/Play'
+import { scenarios } from './scenarios'
+import { pickVariant } from './scenarios/variants'
+import type { Scenario } from './scenarios/types'
 
 type Tab = 'handbook' | 'game' | 'aiguard'
 
@@ -13,6 +17,8 @@ export default function App() {
     if (window.location.hash === '#/aiguard') return 'aiguard'
     return 'handbook'
   })
+  const [activeScenario, setActiveScenario] = useState<{ scenario: Scenario; variantId: number } | null>(null)
+  const [attempts, setAttempts] = useState<Record<string, number>>({})
 
   useEffect(() => {
     const handleHash = () => {
@@ -29,10 +35,53 @@ export default function App() {
   if (hash === '#/teacher') return <Teacher />
 
   const handleSelectTab = (tab: Tab) => {
+    setActiveScenario(null)
     setActiveTab(tab)
     if (tab === 'game') window.location.hash = '#/game'
     else if (tab === 'aiguard') window.location.hash = '#/aiguard'
     else window.location.hash = '#/handbook'
+  }
+
+  const handleOpenScenarioChat = (scenarioId: string) => {
+    const sc = scenarios.find((s) => s.id === scenarioId)
+    if (sc) {
+      setActiveScenario(pickVariant(sc))
+      setAttempts((prev) => ({ ...prev, [scenarioId]: (prev[scenarioId] ?? 0) + 1 }))
+    }
+  }
+
+  // If user is viewing a realistic chat simulation
+  if (activeScenario) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-white flex flex-col font-sans">
+        {/* Top sticky header bar with back button */}
+        <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/95 backdrop-blur-md px-4 py-3 flex items-center justify-between">
+          <button
+            onClick={() => setActiveScenario(null)}
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-xs sm:text-sm font-bold text-white shadow-md transition active:scale-95"
+          >
+            <span>← Quay lại Sổ tay số</span>
+          </button>
+          <div className="text-xs sm:text-sm text-slate-300 font-semibold truncate max-w-md hidden sm:block">
+            💬 Đoạn chat thực tế: <span className="text-white font-extrabold">{activeScenario.scenario.title}</span>
+          </div>
+        </header>
+
+        {/* Main chat simulation container */}
+        <main className="flex-1 flex items-center justify-center p-2 sm:p-4">
+          <Play
+            key={`${activeScenario.scenario.id}-${attempts[activeScenario.scenario.id] ?? 1}`}
+            scenario={activeScenario.scenario}
+            variantId={activeScenario.variantId}
+            mode="web"
+            studentId="HS-VIEW"
+            grade=""
+            attempt={attempts[activeScenario.scenario.id] ?? 1}
+            onFinish={() => setActiveScenario(null)}
+          />
+        </main>
+      </div>
+    )
   }
 
   return (
@@ -123,7 +172,10 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1">
         {activeTab === 'handbook' && (
-          <Handbook onStartGame={() => handleSelectTab('game')} />
+          <Handbook
+            onStartGame={() => handleSelectTab('game')}
+            onOpenChat={handleOpenScenarioChat}
+          />
         )}
         {activeTab === 'game' && (
           <Menu onOpenHandbook={() => handleSelectTab('handbook')} />

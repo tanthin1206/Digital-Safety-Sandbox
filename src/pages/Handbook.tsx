@@ -172,7 +172,12 @@ const TOPICS: ScamTopic[] = [
   },
 ]
 
-export default function Handbook({ onStartGame }: { onStartGame: () => void }) {
+type Props = {
+  onStartGame: () => void
+  onOpenChat: (scenarioId: string) => void
+}
+
+export default function Handbook({ onStartGame, onOpenChat }: Props) {
   const [searchTerm, setSearchTerm] = useState('')
   const [detailTopic, setDetailTopic] = useState<ScamTopic | null>(null)
 
@@ -197,7 +202,7 @@ export default function Handbook({ onStartGame }: { onStartGame: () => void }) {
             Nhận diện các hình thức lừa đảo phổ biến
           </div>
           <p className="mt-2 text-sm text-slate-300 sm:text-base leading-relaxed">
-            Nhận diện chuyên sâu 5 phương thức lừa đảo trực tuyến tinh vi nhất tại Việt Nam hiện nay. Nắm bắt tâm lý tội phạm, vạch trần các đòn thao túng và trang bị lá chắn số an toàn.
+            Nhận diện chuyên sâu 5 phương thức lừa đảo trực tuyến tinh vi nhất tại Việt Nam hiện nay. Nhấn vào từng kịch bản bên dưới để mở giao diện chat thực tế và vạch trần thủ đoạn của kẻ gian.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -209,7 +214,7 @@ export default function Handbook({ onStartGame }: { onStartGame: () => void }) {
               <span>→</span>
             </button>
             <span className="text-xs text-slate-400">
-              ⚡ Nhấn vào từng chiêu trò bên dưới để xem phân tích chi tiết
+              ⚡ Bấm "Mở đoạn chat thực tế" để xem và tương tác trực tiếp
             </span>
           </div>
         </div>
@@ -259,7 +264,7 @@ export default function Handbook({ onStartGame }: { onStartGame: () => void }) {
               <span className="rounded-full bg-indigo-100 text-indigo-700 text-xs px-2.5 py-0.5 font-bold">{filtered.length} chuyên đề</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mt-1">
-              Nhấn vào từng chiêu trò để xem phân tích chi tiết thủ đoạn, đòn tâm lý và cách phòng vệ:
+              Nhấn vào từng kịch bản để mở đoạn chat thực tế mô phỏng:
             </p>
           </div>
 
@@ -287,7 +292,7 @@ export default function Handbook({ onStartGame }: { onStartGame: () => void }) {
           {filtered.map((topic, i) => (
             <div
               key={topic.id}
-              onClick={() => setDetailTopic(topic)}
+              onClick={() => onOpenChat(topic.scenarioId)}
               className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
             >
               <div>
@@ -349,17 +354,27 @@ export default function Handbook({ onStartGame }: { onStartGame: () => void }) {
                 </div>
               </div>
 
-              {/* Action Button: XEM CHI TIẾT */}
-              <div className="border-t border-slate-100 bg-slate-50/70 p-4">
+              {/* Action Buttons: MỞ ĐOẠN CHAT THỰC TẾ & XEM PHÂN TÍCH */}
+              <div className="border-t border-slate-100 bg-slate-50/70 p-4 space-y-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onOpenChat(topic.scenarioId)
+                  }}
+                  className="w-full rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 py-2.5 px-4 text-center text-xs font-bold text-white shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                >
+                  <span>💬 Mở đoạn chat thực tế</span>
+                  <span>→</span>
+                </button>
+
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
                     setDetailTopic(topic)
                   }}
-                  className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 py-2.5 px-4 text-center text-xs font-bold text-white shadow-xs transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="w-full rounded-xl border border-slate-200 bg-white hover:bg-slate-100 py-1.5 px-3 text-center text-[11px] font-semibold text-slate-600 transition"
                 >
-                  <span>📖 Xem chi tiết chiêu trò</span>
-                  <span>→</span>
+                  📖 Xem lý thuyết phân tích
                 </button>
               </div>
             </div>
@@ -414,6 +429,24 @@ export default function Handbook({ onStartGame }: { onStartGame: () => void }) {
                     {detailTopic.subtitle}
                   </p>
                 </div>
+              </div>
+
+              {/* Action Button inside Modal */}
+              <div className="rounded-2xl bg-indigo-50/80 p-4 border border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="text-xs text-indigo-900 font-medium">
+                  Bạn muốn quan sát trực tiếp đoạn tin nhắn và cách thức kẻ gian giăng bẫy?
+                </div>
+                <button
+                  onClick={() => {
+                    const id = detailTopic.scenarioId
+                    setDetailTopic(null)
+                    onOpenChat(id)
+                  }}
+                  className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-5 py-2.5 text-xs font-bold text-white shadow-md transition active:scale-95"
+                >
+                  <span>💬 Mở đoạn chat thực tế</span>
+                  <span>→</span>
+                </button>
               </div>
 
               {/* Summary */}
