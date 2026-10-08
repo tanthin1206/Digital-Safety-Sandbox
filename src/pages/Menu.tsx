@@ -12,9 +12,10 @@ type Props = {
   results: Record<string, ScenarioResult>
   onPick: (id: string) => void
   onFinish: () => void
+  onOpenHandbook?: () => void
 }
 
-export default function Menu({ results, onPick, onFinish }: Props) {
+export default function Menu({ results, onPick, onFinish, onOpenHandbook }: Props) {
   const done = Object.keys(results).length
   const total = scenarios.length
   const pct = Math.round((done / total) * 100)
@@ -24,14 +25,25 @@ export default function Menu({ results, onPick, onFinish }: Props) {
       {/* Header section */}
       <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-            🛡️ Sandbox An Toàn Số · Mô Phỏng Thực Chiến
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+              🎮 Mục 2: Trò chơi "Tàn Ảo" · Trải Nghiệm Thực Tế
+            </div>
+            {onOpenHandbook && (
+              <button
+                onClick={onOpenHandbook}
+                className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 hover:bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 transition"
+              >
+                <span>📖 Xem Mục 1: Sổ tay số "Giải mã Ma Trận"</span>
+                <span>→</span>
+              </button>
+            )}
           </div>
           <h1 className="mt-2 text-2xl font-extrabold text-slate-900 sm:text-3xl">
-            Chọn tình huống lừa đảo
+            Trải nghiệm thực tế với trò chơi Tàn Ảo
           </h1>
           <p className="mt-1 text-sm text-slate-600 max-w-2xl">
-            Mỗi tình huống mô phỏng 100% kịch bản thực tế tại Việt Nam. Sử dụng công cụ điều tra (gọi check, tra cứu STK, quét link) trước khi đưa ra quyết định!
+            Đối mặt trực tiếp với 5 kịch bản lừa đảo tinh vi nhất. Hãy sử dụng công cụ điều tra (gọi check, tra cứu STK, quét link, soi ảnh) để giải mã ma trận và đưa ra quyết định an toàn!
           </p>
         </div>
 
