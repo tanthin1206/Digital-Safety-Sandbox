@@ -139,7 +139,7 @@ export default function Menu({ results, onPick, onFinish }: Props) {
       </div>
 
       {/* Bottom finish button for mobile / scrolling */}
-      <div className="mt-8 flex justify-center border-t border-slate-200 pt-6">
+      <div className="mt-8 flex flex-col items-center gap-3 border-t border-slate-200 pt-6">
         <button
           disabled={done === 0}
           onClick={onFinish}
@@ -147,6 +147,9 @@ export default function Menu({ results, onPick, onFinish }: Props) {
         >
           Hoàn thành và xem đánh giá tổng thể ({done}/{total})
         </button>
+        <a href="#/teacher" className="text-xs text-slate-400 hover:text-slate-600 underline">
+          Dành cho giáo viên / Quản trị
+        </a>
       </div>
     </div>
   )

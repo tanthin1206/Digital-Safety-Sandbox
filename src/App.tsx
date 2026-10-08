@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Welcome, Register } from './pages/Start'
 import Menu from './pages/Menu'
 import Play from './pages/Play'
 import { Result, Survey } from './pages/End'
@@ -10,13 +9,13 @@ import type { Scenario } from './scenarios/types'
 import type { ViewMode } from './components/PhoneFrame'
 import type { ScenarioResult } from './lib/score'
 
-type Step = 'welcome' | 'register' | 'menu' | 'play' | 'result' | 'survey'
+type Step = 'menu' | 'play' | 'result' | 'survey'
 
 export default function App() {
   const [hash, setHash] = useState(window.location.hash)
-  const [step, setStep] = useState<Step>('welcome')
-  const [studentId, setStudentId] = useState('')
-  const [grade, setGrade] = useState('')
+  const [step, setStep] = useState<Step>('menu')
+  const [studentId] = useState(() => 'HS-' + Math.random().toString(36).substring(2, 7).toUpperCase())
+  const [grade] = useState('')
   const [active, setActive] = useState<{ scenario: Scenario; variantId: number } | null>(null)
   const [results, setResults] = useState<Record<string, ScenarioResult>>({})
   const [attempts, setAttempts] = useState<Record<string, number>>({})
@@ -31,18 +30,7 @@ export default function App() {
   if (hash === '#/teacher') return <Teacher />
 
   let page
-  if (step === 'welcome') page = <Welcome onStart={() => setStep('register')} />
-  else if (step === 'register')
-    page = (
-      <Register
-        onDone={(id, g) => {
-          setStudentId(id)
-          setGrade(g)
-          setStep('menu')
-        }}
-      />
-    )
-  else if (step === 'menu')
+  if (step === 'menu')
     page = (
       <Menu
         results={results}
