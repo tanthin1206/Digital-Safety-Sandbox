@@ -57,7 +57,7 @@ export default function AiGuard() {
     setShowKeyModal(false)
   }
 
-  const handleTestKey = async (keyToTest: string, modelToTest = selectedModel) => {
+  const handleTestKey = async (keyToTest: string) => {
     const k = keyToTest.trim()
     if (!k) {
       setKeyTestStatus({
@@ -69,61 +69,88 @@ export default function AiGuard() {
     setTestingKey(true)
     setKeyTestStatus(null)
 
-    const tryModel = async (model: string) => {
-      return fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${k}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: 'Trả lời đúng 1 chữ: OK' }] }],
-          }),
-        },
-      )
-    }
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 8000)
 
     try {
-      let targetModel = modelToTest === 'gemini-2.0-flash' ? 'gemini-3.8-flash' : modelToTest
-      let res = await tryModel(targetModel)
+      // 1. Verify API Key with Google's official models list endpoint (ultra fast, < 0.5s)
+      const listRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models?key=${k}`,
+        { signal: controller.signal },
+      )
 
-      // Fallback chain if model is deprecated (e.g. 2.0-flash) or not found
-      if (!res.ok && (res.status === 404 || res.status === 400)) {
-        const fallbacks = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-1.5-flash']
-        for (const fb of fallbacks) {
-          if (fb === targetModel) continue
-          const fallbackRes = await tryModel(fb)
-          if (fallbackRes.ok) {
-            res = fallbackRes
-            targetModel = fb
-            setSelectedModel(fb)
-            localStorage.setItem('gemini_model', fb)
-            break
-          }
-        }
-      }
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}))
-        const errMsg = errData?.error?.message || `Mã lỗi HTTP ${res.status}`
+      if (!listRes.ok) {
+        const errData = await listRes.json().catch(() => ({}))
+        const errMsg = errData?.error?.message || `Mã lỗi HTTP ${listRes.status}`
         setKeyTestStatus({
           success: false,
-          message: `Kết nối thất bại với mô hình [${targetModel}]: ${errMsg}`,
+          message: `Xác thực thất bại từ Google: ${errMsg}`,
+        })
+        return
+      }
+
+      const listData = await listRes.json().catch(() => ({}))
+      const rawModels: { name: string; supportedGenerationMethods?: string[] }[] = listData?.models || []
+      const availableModels = rawModels
+        .filter((m) => !m.supportedGenerationMethods || m.supportedGenerationMethods.includes('generateContent'))
+        .map((m) => m.name.replace(/^models\//, ''))
+
+      // Determine best active model supported by this key
+      let bestModel = selectedModel
+      if (!availableModels.includes(bestModel)) {
+        const priority = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
+        const matched = priority.find((p) => availableModels.includes(p))
+        bestModel = matched || (availableModels.length > 0 ? availableModels[0] : 'gemini-1.5-flash')
+      }
+
+      // 2. Perform a fast ping generate test
+      let pingOk = false
+      let replyText = 'OK'
+      try {
+        const pingRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${bestModel}:generateContent?key=${k}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: 'Trả lời 1 từ: OK' }] }],
+            }),
+            signal: controller.signal,
+          },
+        )
+        if (pingRes.ok) {
+          const pingData = await pingRes.json().catch(() => ({}))
+          replyText = pingData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'OK'
+          pingOk = true
+        }
+      } catch {
+        // Ping error/timeout is non-fatal if listRes was 200 OK
+      }
+
+      setSelectedModel(bestModel)
+      localStorage.setItem('gemini_model', bestModel)
+
+      setKeyTestStatus({
+        success: true,
+        message: pingOk
+          ? `Kết nối thành công! Khóa API Gemini hợp lệ với mô hình [${bestModel}] (Google phản hồi: "${replyText}"). Sẵn sàng phân tích an toàn mạng.`
+          : `Khóa API Gemini hợp lệ! Đã xác thực tài khoản với Google AI Studio (Mô hình phát hiện: [${bestModel}]).`,
+      })
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        setKeyTestStatus({
+          success: false,
+          message: 'Quá thời gian kết nối (Timeout sau 8 giây). Vui lòng kiểm tra lại mạng Internet hoặc VPN.',
         })
       } else {
-        const data = await res.json().catch(() => ({}))
-        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+        const msg = err instanceof Error ? err.message : 'Lỗi kết nối'
         setKeyTestStatus({
-          success: true,
-          message: `Kết nối thành công! Khóa API hợp lệ với mô hình chuẩn mới nhất [${targetModel}] (Google phản hồi: "${reply || 'OK'}"). Sẵn sàng phân tích an toàn mạng.`,
+          success: false,
+          message: `Lỗi kết nối: ${msg}. Vui lòng kiểm tra lại đường truyền mạng.`,
         })
       }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Lỗi kết nối'
-      setKeyTestStatus({
-        success: false,
-        message: `Lỗi kết nối: ${msg}. Vui lòng kiểm tra lại kết nối mạng hoặc tính hợp lệ của khóa API.`,
-      })
     } finally {
+      clearTimeout(timer)
       setTestingKey(false)
     }
   }
@@ -300,50 +327,63 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
   "urgentAdvice": ["Lời khuyên khẩn cấp 1", "Lời khuyên khẩn cấp 2", "Lời khuyên khẩn cấp 3"]
 }`
 
-    let targetModel = selectedModel === 'gemini-2.0-flash' ? 'gemini-3.8-flash' : selectedModel
-    const callApi = async (m: string) => {
-      return fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${key}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { responseMimeType: 'application/json' },
-          }),
-        },
-      )
-    }
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 15000)
 
-    let res = await callApi(targetModel)
+    try {
+      let targetModel = selectedModel === 'gemini-2.0-flash' ? 'gemini-3.8-flash' : selectedModel
+      const callApi = async (m: string) => {
+        return fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${key}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { responseMimeType: 'application/json' },
+            }),
+            signal: controller.signal,
+          },
+        )
+      }
 
-    // Fallback if model not found or deprecated
-    if (!res.ok && (res.status === 404 || res.status === 400)) {
-      const fallbacks = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-1.5-flash']
-      for (const fb of fallbacks) {
-        if (fb === targetModel) continue
-        const fbRes = await callApi(fb)
-        if (fbRes.ok) {
-          res = fbRes
-          targetModel = fb
-          setSelectedModel(fb)
-          localStorage.setItem('gemini_model', fb)
-          break
+      let res = await callApi(targetModel)
+
+      // Fallback if model not found or deprecated
+      if (!res.ok && (res.status === 404 || res.status === 400)) {
+        const fallbacks = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-1.5-flash']
+        for (const fb of fallbacks) {
+          if (fb === targetModel) continue
+          const fbRes = await callApi(fb)
+          if (fbRes.ok) {
+            res = fbRes
+            targetModel = fb
+            setSelectedModel(fb)
+            localStorage.setItem('gemini_model', fb)
+            break
+          }
         }
       }
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err?.error?.message || `Lỗi kết nối Gemini API [${targetModel}] (Mã lỗi ${res.status})`)
+      }
+
+      const data = await res.json()
+      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text
+      if (!rawText) throw new Error('Không nhận được dữ liệu phản hồi từ Gemini.')
+
+      const parsed = JSON.parse(rawText) as AnalysisResult
+      return parsed
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        throw new Error('Yêu cầu phân tích Gemini bị quá thời gian (Timeout 15s).')
+      }
+      throw err
+    } finally {
+      clearTimeout(timer)
     }
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}))
-      throw new Error(err?.error?.message || `Lỗi kết nối Gemini API [${targetModel}] (Mã lỗi ${res.status})`)
-    }
-
-    const data = await res.json()
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text
-    if (!rawText) throw new Error('Không nhận được dữ liệu phản hồi từ Gemini.')
-
-    const parsed = JSON.parse(rawText) as AnalysisResult
-    return parsed
   }
 
   const handleAnalyze = async () => {
