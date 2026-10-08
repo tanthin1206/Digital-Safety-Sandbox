@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { scenarios } from '../scenarios'
 import type { Platform } from '../scenarios/types'
 import type { ScenarioResult } from '../lib/score'
@@ -16,6 +17,7 @@ type Props = {
 }
 
 export default function Menu({ results, onPick, onFinish, onOpenHandbook }: Props) {
+  const [copied, setCopied] = useState(false)
   const done = Object.keys(results).length
   const total = scenarios.length
   const pct = Math.round((done / total) * 100)
@@ -68,8 +70,103 @@ export default function Menu({ results, onPick, onFinish, onOpenHandbook }: Prop
         </div>
       </div>
 
+      {/* Hero Portal Card: Nhấn trực tiếp vào đây hoặc quét qr để trải nghiệm */}
+      <div className="mt-6 overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950 via-slate-900 to-blue-950 p-6 sm:p-8 text-white shadow-2xl border border-indigo-800/40 relative">
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex-1 space-y-4 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/20 px-4 py-1.5 text-xs font-semibold text-indigo-300 border border-indigo-400/30">
+              ✨ TRẢI NGHIỆM TRÒ CHƠI "TÀN ẢO" TRỰC TUYẾN
+            </div>
+            
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight">
+              Nhấn trực tiếp vào đây hoặc quét qr để trãi nghiệm
+            </h2>
+            
+            <p className="text-slate-300 text-sm sm:text-base max-w-xl leading-relaxed">
+              Truy cập ngay phiên bản trò chơi <strong className="text-white">"Tàn Ảo"</strong> trên nền tảng web di động để nhập vai xử lý các tình huống lừa đảo nghẹt thở.
+            </p>
+
+            {/* Direct Link Button */}
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <a
+                href="https://tanthin1206.github.io/t-n-t-o/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 py-4 text-sm sm:text-base font-extrabold text-white shadow-lg hover:from-blue-500 hover:to-purple-500 hover:scale-[1.02] active:scale-95 transition-all text-center"
+              >
+                <span>👉 Nhấn trực tiếp vào đây để trải nghiệm</span>
+                <span>↗</span>
+              </a>
+
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText('https://tanthin1206.github.io/t-n-t-o/')
+                  setCopied(true)
+                  setTimeout(() => setCopied(false), 2500)
+                }}
+                className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-3.5 text-xs sm:text-sm font-semibold text-slate-200 transition active:scale-95"
+              >
+                <span>{copied ? '✓ Đã sao chép link!' : '📋 Sao chép link'}</span>
+              </button>
+            </div>
+
+            <div className="text-xs text-indigo-300/80 font-mono break-all pt-1">
+              🔗 Link:{' '}
+              <a
+                href="https://tanthin1206.github.io/t-n-t-o/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-white font-semibold"
+              >
+                https://tanthin1206.github.io/t-n-t-o/
+              </a>
+            </div>
+          </div>
+
+          {/* QR Code Container */}
+          <div className="flex flex-col items-center shrink-0">
+            <a
+              href="https://tanthin1206.github.io/t-n-t-o/"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Nhấn để mở trò chơi hoặc quét QR"
+              className="group relative rounded-2xl bg-white p-3.5 shadow-2xl ring-4 ring-indigo-500/30 transition-transform hover:scale-105 block"
+            >
+              <img
+                src="images/qr_tanao.png"
+                alt="Mã QR trải nghiệm trò chơi Tàn Ảo"
+                className="h-44 w-44 sm:h-52 sm:w-52 rounded-xl object-contain"
+              />
+              <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/10 pointer-events-none" />
+            </a>
+            <div className="mt-3 text-center">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-200">
+                <span>📱</span> Quét mã QR bằng Camera / Zalo
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Decorative blur */}
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-16 -bottom-16 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl" />
+      </div>
+
+      {/* Section Divider & Sandbox Scenarios Grid */}
+      <div className="mt-10 mb-4 flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span>🛡️ Bộ Kịch Bản Thực Chiến Mô Phỏng Trên Web</span>
+            <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs text-slate-700 font-semibold">{total} tình huống</span>
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Trải nghiệm trực tiếp các tình huống mô phỏng chi tiết ngay tại trình duyệt:
+          </p>
+        </div>
+      </div>
+
       {/* Grid of Scenarios - dàn hàng ngang đa cột */}
-      <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {scenarios.map((s, idx) => {
           const b = BADGE[s.platform]
           const r = results[s.id]
