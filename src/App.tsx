@@ -1,16 +1,8 @@
 import { useEffect, useState } from 'react'
 import Menu from './pages/Menu'
-import Play from './pages/Play'
-import { Result, Survey } from './pages/End'
 import Teacher from './pages/Teacher'
 import Handbook from './pages/Handbook'
-import { scenarios } from './scenarios'
-import { pickVariant } from './scenarios/variants'
-import type { Scenario } from './scenarios/types'
-import type { ViewMode } from './components/PhoneFrame'
-import type { ScenarioResult } from './lib/score'
 
-type Step = 'menu' | 'play' | 'result' | 'survey'
 type Tab = 'handbook' | 'game'
 
 export default function App() {
@@ -19,13 +11,6 @@ export default function App() {
     if (window.location.hash === '#/game') return 'game'
     return 'handbook'
   })
-  const [step, setStep] = useState<Step>('menu')
-  const [studentId] = useState(() => 'HS-' + Math.random().toString(36).substring(2, 7).toUpperCase())
-  const [grade] = useState('')
-  const [active, setActive] = useState<{ scenario: Scenario; variantId: number } | null>(null)
-  const [results, setResults] = useState<Record<string, ScenarioResult>>({})
-  const [attempts, setAttempts] = useState<Record<string, number>>({})
-  const mode: ViewMode = 'web'
 
   useEffect(() => {
     const handleHash = () => {
@@ -43,50 +28,6 @@ export default function App() {
   const handleSelectTab = (tab: Tab) => {
     setActiveTab(tab)
     window.location.hash = tab === 'game' ? '#/game' : '#/handbook'
-  }
-
-  const handlePickScenario = (id: string) => {
-    const sc = scenarios.find((s) => s.id === id)
-    if (sc) {
-      setActive(pickVariant(sc))
-      setAttempts((a) => ({ ...a, [id]: (a[id] ?? 0) + 1 }))
-      setStep('play')
-      setActiveTab('game')
-      window.location.hash = '#/game'
-    }
-  }
-
-  let gamePage
-  if (step === 'menu') {
-    gamePage = (
-      <Menu
-        results={results}
-        onPick={handlePickScenario}
-        onFinish={() => setStep('result')}
-        onOpenHandbook={() => handleSelectTab('handbook')}
-      />
-    )
-  } else if (step === 'play' && active) {
-    const sc = active.scenario
-    gamePage = (
-      <Play
-        key={`${sc.id}-${attempts[sc.id]}`}
-        scenario={sc}
-        variantId={active.variantId}
-        mode={mode}
-        studentId={studentId}
-        grade={grade}
-        attempt={attempts[sc.id] ?? 1}
-        onFinish={(res) => {
-          if (res) setResults((r) => ({ ...r, [sc.id]: res }))
-          setStep('menu')
-        }}
-      />
-    )
-  } else if (step === 'result') {
-    gamePage = <Result results={results} onBack={() => setStep('menu')} onNext={() => setStep('survey')} />
-  } else {
-    gamePage = <Survey studentId={studentId} grade={grade} />
   }
 
   return (
@@ -157,15 +98,11 @@ export default function App() {
       <main className="flex-1">
         {activeTab === 'handbook' ? (
           <Handbook
-            onStartGame={() => {
-              setActiveTab('game')
-              setStep('menu')
-              window.location.hash = '#/game'
-            }}
-            onPickScenario={handlePickScenario}
+            onStartGame={() => handleSelectTab('game')}
+            onPickScenario={() => handleSelectTab('game')}
           />
         ) : (
-          gamePage
+          <Menu onOpenHandbook={() => handleSelectTab('handbook')} />
         )}
       </main>
     </div>
