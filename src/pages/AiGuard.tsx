@@ -36,6 +36,7 @@ const SAMPLE_MESSAGES = [
 
 export default function AiGuard() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '')
+  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem('gemini_model') || 'gemini-1.5-flash')
   const [showKeyModal, setShowKeyModal] = useState(false)
   const [inputKey, setInputKey] = useState(apiKey)
   const [message, setMessage] = useState('')
@@ -47,11 +48,12 @@ export default function AiGuard() {
 
   const handleSaveKey = () => {
     localStorage.setItem('gemini_api_key', inputKey.trim())
+    localStorage.setItem('gemini_model', selectedModel)
     setApiKey(inputKey.trim())
     setShowKeyModal(false)
   }
 
-  const handleTestKey = async (keyToTest: string) => {
+  const handleTestKey = async (keyToTest: string, modelToTest = selectedModel) => {
     const k = keyToTest.trim()
     if (!k) {
       setKeyTestStatus({
@@ -63,9 +65,9 @@ export default function AiGuard() {
     setTestingKey(true)
     setKeyTestStatus(null)
 
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`,
+    const tryModel = async (model: string) => {
+      return fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${k}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -74,20 +76,36 @@ export default function AiGuard() {
           }),
         },
       )
+    }
+
+    try {
+      let activeModel = modelToTest
+      let res = await tryModel(activeModel)
+
+      // Fallback if model not found on account
+      if (!res.ok && res.status === 404 && activeModel !== 'gemini-1.5-flash') {
+        const fallbackRes = await tryModel('gemini-1.5-flash')
+        if (fallbackRes.ok) {
+          res = fallbackRes
+          activeModel = 'gemini-1.5-flash'
+          setSelectedModel('gemini-1.5-flash')
+          localStorage.setItem('gemini_model', 'gemini-1.5-flash')
+        }
+      }
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}))
         const errMsg = errData?.error?.message || `Mã lỗi HTTP ${res.status}`
         setKeyTestStatus({
           success: false,
-          message: `Kết nối thất bại: ${errMsg}`,
+          message: `Kết nối thất bại với mô hình [${activeModel}]: ${errMsg}`,
         })
       } else {
         const data = await res.json().catch(() => ({}))
         const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
         setKeyTestStatus({
           success: true,
-          message: `Kết nối thành công! Khóa API Gemini hợp lệ (Phản hồi: "${reply || 'OK'}"). Sẵn sàng sử dụng với mô hình Gemini 2.0 Flash.`,
+          message: `Kết nối thành công! Khóa API hợp lệ với mô hình chuẩn [${activeModel}] (Google phản hồi: "${reply || 'OK'}"). Sẵn sàng phân tích an toàn mạng.`,
         })
       }
     } catch (err: unknown) {
@@ -273,8 +291,9 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
   "urgentAdvice": ["Lời khuyên khẩn cấp 1", "Lời khuyên khẩn cấp 2", "Lời khuyên khẩn cấp 3"]
 }`
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
+    let activeModel = selectedModel
+    let res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${key}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -285,9 +304,25 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
       },
     )
 
+    // Fallback if model not found on account
+    if (!res.ok && res.status === 404 && activeModel !== 'gemini-1.5-flash') {
+      activeModel = 'gemini-1.5-flash'
+      res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${key}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: 'application/json' },
+          }),
+        },
+      )
+    }
+
     if (!res.ok) {
-      const err = await res.json()
-      throw new Error(err?.error?.message || `Lỗi kết nối Gemini API (Mã lỗi ${res.status})`)
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err?.error?.message || `Lỗi kết nối Gemini API [${activeModel}] (Mã lỗi ${res.status})`)
     }
 
     const data = await res.json()
@@ -339,7 +374,7 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
           <h1 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl flex items-center gap-2.5">
             <span>Trợ lý ảo AI "Cảnh Vệ Số"</span>
             <span className="rounded-full bg-indigo-600 px-2.5 py-0.5 text-xs font-bold text-white uppercase tracking-wider">
-              Gemini AI
+              {selectedModel === 'gemini-1.5-flash' ? 'Gemini 1.5 Flash (Chuẩn)' : selectedModel}
             </span>
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
@@ -598,8 +633,30 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
 
             <div className="mt-4 space-y-3">
               <p className="text-xs text-slate-600 leading-relaxed">
-                Hệ thống mặc định đã tích hợp sẵn AI Cảnh Vệ Số có thể quét ngay lập tức. Nếu bạn có <strong>Google Gemini API Key</strong> riêng, hãy dán vào đây để kích hoạt mô hình <strong>Gemini 2.0 Flash</strong> phân tích chuyên sâu hơn.
+                Hệ thống mặc định đã tích hợp sẵn AI Cảnh Vệ Số có thể quét ngay lập tức. Nếu bạn có <strong>Google Gemini API Key</strong> riêng, hãy dán vào đây để kích hoạt mô hình chuẩn <strong>Gemini 1.5 Flash</strong> từ Google AI Studio.
               </p>
+
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                  Mô hình Gemini tiêu chuẩn:
+                </label>
+                <select
+                  value={selectedModel}
+                  onChange={(e) => {
+                    setSelectedModel(e.target.value)
+                    setKeyTestStatus(null)
+                  }}
+                  className="mt-1 w-full rounded-xl border border-slate-300 p-2 text-xs text-slate-900 bg-white font-medium focus:border-indigo-600 focus:outline-hidden"
+                >
+                  <option value="gemini-1.5-flash">Gemini 1.5 Flash (Tiêu chuẩn Google AI Studio - Nhanh, ổn định & miễn phí)</option>
+                  <option value="gemini-2.0-flash">Gemini 2.0 Flash (Thế hệ mới 2.0)</option>
+                  <option value="gemini-1.5-pro">Gemini 1.5 Pro (Mô hình suy luận sâu)</option>
+                </select>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Google khuyến nghị sử dụng <strong>gemini-1.5-flash</strong> cho các tác vụ phân tích thời gian thực và tương thích 100% với tài khoản miễn phí.
+                </p>
+              </div>
+
               <div>
                 <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                   Gemini API Key:
