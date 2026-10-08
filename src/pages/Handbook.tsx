@@ -81,7 +81,7 @@ const TOPICS: ScamTopic[] = [
   },
   {
     id: 'telegram-task',
-    scenarioId: 'sc3-telegram-task',
+    scenarioId: 'sc3-tiktok-job',
     title: 'Bẫy Cộng Tác Viên Telegram: "Nhiệm Vụ Đơn Hàng Phúc Lợi"',
     subtitle: 'Thao túng chi phí chìm (Sunk Cost) và bẫy Ponzi đóng tiền cứu vốn',
     category: 'Lừa đảo việc làm trực tuyến',
@@ -111,7 +111,7 @@ const TOPICS: ScamTopic[] = [
   },
   {
     id: 'vneid-trojan',
-    scenarioId: 'sc4-zalo-bca',
+    scenarioId: 'sc4-fake-app',
     title: 'Giả Danh Cán Bộ VNeID Đề Án 06 Cài Trojan Chiếm Quyền',
     subtitle: 'Dụ tải file .apk kích hoạt Accessibility trộm mã OTP ngân hàng',
     category: 'Mã độc tống tiền & Trộm dữ liệu ngân hàng',
@@ -141,7 +141,7 @@ const TOPICS: ScamTopic[] = [
   },
   {
     id: 'border-job',
-    scenarioId: 'sc5-job-scam',
+    scenarioId: 'sc5-abroad-job',
     title: 'Việc Nhẹ Lương Cao KCN Mộc Bài: Bẫy Buôn Người Biên Giới',
     subtitle: 'Đài thọ toàn bộ chi phí để bắt cóc ép làm việc lừa đảo tại Campuchia',
     category: 'Tội phạm buôn bán người xuyên biên giới',

@@ -47,33 +47,42 @@ export default function App() {
     if (sc) {
       setActiveScenario(pickVariant(sc))
       setAttempts((prev) => ({ ...prev, [scenarioId]: (prev[scenarioId] ?? 0) + 1 }))
+    } else {
+      console.warn('Scenario not found:', scenarioId)
     }
   }
 
   // If user is viewing a realistic chat simulation
   if (activeScenario) {
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex flex-col font-sans">
-        {/* Top sticky header bar with back button */}
-        <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/95 backdrop-blur-md px-4 py-3 flex items-center justify-between">
+      <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col font-sans overflow-hidden">
+        {/* Top sticky exit / control header */}
+        <header className="shrink-0 z-50 border-b border-slate-800 bg-slate-900/95 backdrop-blur-md px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between shadow-md">
           <button
             onClick={() => setActiveScenario(null)}
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-xs sm:text-sm font-bold text-white shadow-md transition active:scale-95"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 px-3.5 py-1.5 text-xs sm:text-sm font-bold text-white shadow transition active:scale-95"
           >
             <span>← Quay lại Sổ tay số</span>
           </button>
-          <div className="text-xs sm:text-sm text-slate-300 font-semibold truncate max-w-md hidden sm:block">
+          <div className="text-xs sm:text-sm text-slate-300 font-semibold truncate max-w-[200px] sm:max-w-md px-2">
             💬 Đoạn chat thực tế: <span className="text-white font-extrabold">{activeScenario.scenario.title}</span>
           </div>
+          <button
+            onClick={() => setActiveScenario(null)}
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition"
+            title="Đóng mô phỏng"
+          >
+            <span className="text-base font-bold leading-none">✕</span>
+          </button>
         </header>
 
-        {/* Main chat simulation container */}
-        <main className="flex-1 flex items-center justify-center p-2 sm:p-4">
+        {/* Fullscreen realistic chat simulation */}
+        <main className="flex-1 w-full h-full overflow-hidden bg-slate-100 flex items-center justify-center">
           <Play
             key={`${activeScenario.scenario.id}-${attempts[activeScenario.scenario.id] ?? 1}`}
             scenario={activeScenario.scenario}
             variantId={activeScenario.variantId}
-            mode="web"
+            mode="fullscreen"
             studentId="HS-VIEW"
             grade=""
             attempt={attempts[activeScenario.scenario.id] ?? 1}

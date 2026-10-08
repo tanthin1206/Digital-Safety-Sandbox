@@ -154,7 +154,7 @@ export default function Play({ scenario, variantId, mode, studentId, grade, atte
   ) : null
 
   return (
-    <div className={mode === 'web' ? 'p-2 sm:p-3' : 'p-3'}>
+    <div className={mode === 'fullscreen' ? 'h-full w-full' : mode === 'web' ? 'p-2 sm:p-3' : 'p-3'}>
       <PhoneFrame
         platform={scenario.platform}
         mode={mode}
