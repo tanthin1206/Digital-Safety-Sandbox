@@ -34,12 +34,14 @@ const SAMPLE_MESSAGES = [
   },
 ]
 
+const FIXED_MODEL = 'gemini-3.5-flash-lite'
+
 export default function AiGuard() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '')
   const [selectedModel, setSelectedModel] = useState(() => {
     const saved = localStorage.getItem('gemini_model')
-    if (saved && saved !== 'gemini-2.0-flash') return saved
-    return 'gemini-3.8-flash'
+    void saved
+    return FIXED_MODEL
   })
   const [showKeyModal, setShowKeyModal] = useState(false)
   const [inputKey, setInputKey] = useState(apiKey)
@@ -98,9 +100,9 @@ export default function AiGuard() {
       // Determine best active model supported by this key
       let bestModel = selectedModel
       if (!availableModels.includes(bestModel)) {
-        const priority = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
+        const priority = [FIXED_MODEL]
         const matched = priority.find((p) => availableModels.includes(p))
-        bestModel = matched || (availableModels.length > 0 ? availableModels[0] : 'gemini-1.5-flash')
+        bestModel = matched || FIXED_MODEL
       }
 
       // 2. Perform a fast ping generate test
@@ -327,8 +329,8 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
   "urgentAdvice": ["Lời khuyên khẩn cấp 1", "Lời khuyên khẩn cấp 2", "Lời khuyên khẩn cấp 3"]
 }`
 
-    const first = selectedModel === 'gemini-2.0-flash' ? 'gemini-3.8-flash' : selectedModel
-    const chain = [first, ...['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-1.5-flash'].filter((m) => m !== first)]
+    const first = FIXED_MODEL
+    const chain = [first]
     const errors: string[] = []
 
     for (const model of chain) {
@@ -436,7 +438,7 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
           <h1 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl flex items-center gap-2.5">
             <span>Trợ lý ảo AI "Cảnh Vệ Số"</span>
             <span className="rounded-full bg-indigo-600 px-2.5 py-0.5 text-xs font-bold text-white uppercase tracking-wider">
-              {selectedModel === 'gemini-3.8-flash' ? 'Gemini 3.8 Flash (Chuẩn)' : selectedModel}
+              Gemini 3.5 Flash-Lite
             </span>
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
@@ -695,28 +697,11 @@ YÊU CẦU: Trả về kết quả hoàn toàn bằng cú pháp JSON hợp lệ,
 
             <div className="mt-4 space-y-3">
               <p className="text-xs text-slate-600 leading-relaxed">
-                Hệ thống mặc định đã tích hợp sẵn AI Cảnh Vệ Số có thể quét ngay lập tức. Nếu bạn có <strong>Google Gemini API Key</strong> riêng, hãy dán vào đây để kích hoạt mô hình chuẩn <strong>Gemini 1.5 Flash</strong> từ Google AI Studio.
+                Hệ thống mặc định đã tích hợp sẵn AI Cảnh Vệ Số có thể quét ngay lập tức. Nếu bạn có <strong>Google Gemini API Key</strong> riêng, hãy dán vào đây để kích hoạt mô hình <strong>Gemini 3.5 Flash-Lite</strong>.
               </p>
 
-              <div>
-                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-                  Mô hình Gemini tiêu chuẩn:
-                </label>
-                <select
-                  value={selectedModel}
-                  onChange={(e) => {
-                    setSelectedModel(e.target.value)
-                    setKeyTestStatus(null)
-                  }}
-                  className="mt-1 w-full rounded-xl border border-slate-300 p-2 text-xs text-slate-900 bg-white font-medium focus:border-indigo-600 focus:outline-hidden"
-                >
-                  <option value="gemini-3.8-flash">Gemini 3.8 Flash (Mô hình mới nhất Google khuyến nghị - Tốc độ & Thông minh)</option>
-                  <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite (Siêu nhanh, tối ưu chi phí)</option>
-                  <option value="gemini-1.5-flash">Gemini 1.5 Flash (Bản tương thích phổ thông)</option>
-                </select>
-                <p className="mt-1 text-[11px] text-slate-500">
-                  Google chính thức khuyến nghị sử dụng <strong>gemini-3.8-flash</strong> cho API mới nhất để có tính năng và độ chính xác phân tích cao nhất.
-                </p>
+              <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs font-semibold text-indigo-800">
+                Mô hình sử dụng: Gemini 3.5 Flash-Lite <span className="font-mono font-normal text-indigo-600">({FIXED_MODEL})</span>
               </div>
 
               <div>
